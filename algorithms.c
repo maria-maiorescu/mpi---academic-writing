@@ -57,6 +57,18 @@ TO DO:
 #include <stdlib.h>
 #include <time.h>
 
+#define BUBBLE_SORT 0
+#define QUICK_SORT 1
+
+static const char* ALGORITHM_NAMES[] = {
+    "bubble sort",
+    "quick sort",
+   // "insertion sort",
+   // "selection sort",
+    // "merge sort",
+    // "radix sort"
+};
+
 void resetRandomSeed() { srand((unsigned int)time(NULL)); }
 
 clock_t startOperationTimer() { return clock(); }
@@ -135,37 +147,87 @@ void bubbleSort(int* array, unsigned long size) {
     }
 }
 
-double measureBubbleSort(int* data, unsigned long size) {
+void swapInts(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+long partitionQuickSort(int* array, long low, long high) {
+    int pivot = array[high];
+    long i = low - 1;
+
+    for (long j = low; j < high; j++) {
+        if (array[j] <= pivot) {
+            i++;
+            swapInts(&array[i], &array[j]);
+        }
+    }
+
+    swapInts(&array[i + 1], &array[high]);
+    return i + 1;
+}
+
+void quickSortRecursive(int* array, long low, long high) {
+    if (low < high) {
+        long pivotIndex = partitionQuickSort(array, low, high);
+        quickSortRecursive(array, low, pivotIndex - 1);
+        quickSortRecursive(array, pivotIndex + 1, high);
+    }
+}
+
+void quickSort(int* array, unsigned long size) {
+    if (array == NULL || size < 2) {
+        return;
+    }
+
+    quickSortRecursive(array, 0, (long)size - 1);
+}
+
+double measureSortAlg(int type, int* data, unsigned long size) {
     clock_t startTime = startOperationTimer();
-    bubbleSort(data, size);
+    switch (type) {
+        case BUBBLE_SORT:
+            bubbleSort(data, size);
+            break;
+        
+        case QUICK_SORT:
+            quickSort(data, size);
+            break;
+        
+        default:
+            printf("not implemented");
+    }
+    
     double elapsedMs = stopOperationTimerMs(startTime);
 
     return elapsedMs;
 }
 
-void analyzeBubbleSort(unsigned long size, int count) {
+void analyzeSortAlg(int type, unsigned long size, int count) {
     double elapsedMs, sumMs;
+    const char* algorithmName = ALGORITHM_NAMES[type];
     int* x;
 
     // reverse sorted
     sumMs = 0;
     for (int i = 0; i < count; i++) {
-        x = generateIntArray(size);
-        sumMs += measureBubbleSort(x, size);
+        x = generateReverseSortedIntArray(size);
+        sumMs += measureSortAlg(type, x, size);
         free(x);
     }
     elapsedMs = sumMs/count;
-    printf("%lu elements, %d runs, bubble sort (reversed), elapsed time: %.3f ms\n", size, count, elapsedMs);
+    printf("%lu elements, %d runs, %s (reversed), elapsed time: %.3f ms\n", size, count, algorithmName, elapsedMs);
   
     // random data
     sumMs = 0;
     for (int i = 0; i < count; i++) {
         x = generateIntArray(size);
-        sumMs += measureBubbleSort(x, size);
+        sumMs += measureSortAlg(type, x, size);
         free(x);
     }
     elapsedMs = sumMs/count;
-    printf("%lu elements, %d runs, bubble sort (random), elapsed time: %.3f ms\n", size, count, elapsedMs);
+    printf("%lu elements, %d runs, %s (random), elapsed time: %.3f ms\n", size, count, algorithmName, elapsedMs);
     
 
     // partially sorted
@@ -173,24 +235,29 @@ void analyzeBubbleSort(unsigned long size, int count) {
         sumMs = 0;
         for (int i = 0; i < count; i++) {
             x = generatePartiallySortedIntArray(size, factor);
-            sumMs += measureBubbleSort(x, size);
+            sumMs += measureSortAlg(type, x, size);
             free(x);
         }
         elapsedMs = sumMs/count;
-        printf("%lu elements, %d runs, bubble sort (partially sorted %d%%), elapsed time: %.3f ms\n", size, count, factor, elapsedMs);
+        printf("%lu elements, %d runs, %s (partially sorted %d%%), elapsed time: %.3f ms\n", size, count, algorithmName, factor, elapsedMs);
         
     }
     printf("\n");
 }
 
+void analyzeAlgo(unsigned long size, int count) {
+    analyzeSortAlg(BUBBLE_SORT, size, count);
+    analyzeSortAlg(QUICK_SORT, size, count);
+}
+
 int main() {
     resetRandomSeed();
 
-    analyzeBubbleSort(10, 1000000);
-    analyzeBubbleSort(50, 1000000);
-    analyzeBubbleSort(100, 1000000);
-    analyzeBubbleSort(1000, 100);
-    analyzeBubbleSort(10000, 10);
+    analyzeAlgo(10, 1000000);
+    analyzeAlgo(50, 1000000);
+    analyzeAlgo(100, 1000000);
+    analyzeAlgo(1000, 100);
+    analyzeAlgo(10000, 10);
     //analyzeBubbleSort(100000);
     // analyzeBubbleSort(1000000);
 

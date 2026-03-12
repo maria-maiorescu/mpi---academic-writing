@@ -1,0 +1,79 @@
+10 elements, 1000000 runs, bubble (reversed), elapsed time: 0.001 ms
+10 elements, 1000000 runs, bubble (random), elapsed time: 0.001 ms
+10 elements, 1000000 runs, bubble (partially sorted 10%), elapsed time: 0.001 ms
+10 elements, 1000000 runs, bubble (partially sorted 30%), elapsed time: 0.001 ms
+10 elements, 1000000 runs, bubble (partially sorted 50%), elapsed time: 0.001 ms
+10 elements, 1000000 runs, bubble (partially sorted 70%), elapsed time: 0.001 ms
+10 elements, 1000000 runs, bubble (partially sorted 90%), elapsed time: 0.001 ms
+
+10 elements, 1000000 runs, quick (reversed), elapsed time: 0.001 ms
+10 elements, 1000000 runs, quick (random), elapsed time: 0.001 ms
+10 elements, 1000000 runs, quick (partially sorted 10%), elapsed time: 0.001 ms
+10 elements, 1000000 runs, quick (partially sorted 30%), elapsed time: 0.001 ms
+10 elements, 1000000 runs, quick (partially sorted 50%), elapsed time: 0.001 ms
+10 elements, 1000000 runs, quick (partially sorted 70%), elapsed time: 0.001 ms
+10 elements, 1000000 runs, quick (partially sorted 90%), elapsed time: 0.001 ms
+
+50 elements, 1000000 runs, bubble (reversed), elapsed time: 0.004 ms
+50 elements, 1000000 runs, bubble (random), elapsed time: 0.005 ms
+50 elements, 1000000 runs, bubble (partially sorted 10%), elapsed time: 0.003 ms
+50 elements, 1000000 runs, bubble (partially sorted 30%), elapsed time: 0.002 ms
+50 elements, 1000000 runs, bubble (partially sorted 50%), elapsed time: 0.002 ms
+50 elements, 1000000 runs, bubble (partially sorted 70%), elapsed time: 0.002 ms
+50 elements, 1000000 runs, bubble (partially sorted 90%), elapsed time: 0.002 ms
+
+50 elements, 1000000 runs, quick (reversed), elapsed time: 0.004 ms
+50 elements, 1000000 runs, quick (random), elapsed time: 0.002 ms
+50 elements, 1000000 runs, quick (partially sorted 10%), elapsed time: 0.003 ms
+50 elements, 1000000 runs, quick (partially sorted 30%), elapsed time: 0.005 ms
+50 elements, 1000000 runs, quick (partially sorted 50%), elapsed time: 0.005 ms
+50 elements, 1000000 runs, quick (partially sorted 70%), elapsed time: 0.005 ms
+50 elements, 1000000 runs, quick (partially sorted 90%), elapsed time: 0.005 ms
+
+100 elements, 1000000 runs, bubble (reversed), elapsed time: 0.014 ms
+100 elements, 1000000 runs, bubble (random), elapsed time: 0.017 ms
+100 elements, 1000000 runs, bubble (partially sorted 10%), elapsed time: 0.009 ms
+100 elements, 1000000 runs, bubble (partially sorted 30%), elapsed time: 0.007 ms
+100 elements, 1000000 runs, bubble (partially sorted 50%), elapsed time: 0.006 ms
+100 elements, 1000000 runs, bubble (partially sorted 70%), elapsed time: 0.004 ms
+100 elements, 1000000 runs, bubble (partially sorted 90%), elapsed time: 0.004 ms
+
+100 elements, 1000000 runs, quick (reversed), elapsed time: 0.014 ms
+100 elements, 1000000 runs, quick (random), elapsed time: 0.005 ms
+100 elements, 1000000 runs, quick (partially sorted 10%), elapsed time: 0.007 ms
+100 elements, 1000000 runs, quick (partially sorted 30%), elapsed time: 0.012 ms
+100 elements, 1000000 runs, quick (partially sorted 50%), elapsed time: 0.014 ms
+100 elements, 1000000 runs, quick (partially sorted 70%), elapsed time: 0.017 ms
+100 elements, 1000000 runs, quick (partially sorted 90%), elapsed time: 0.017 ms
+
+1000 elements, 100 runs, bubble (reversed), elapsed time: 1.340 ms
+1000 elements, 100 runs, bubble (random), elapsed time: 1.169 ms
+1000 elements, 100 runs, bubble (partially sorted 10%), elapsed time: 0.853 ms
+1000 elements, 100 runs, bubble (partially sorted 30%), elapsed time: 0.769 ms
+1000 elements, 100 runs, bubble (partially sorted 50%), elapsed time: 0.738 ms
+1000 elements, 100 runs, bubble (partially sorted 70%), elapsed time: 0.729 ms
+1000 elements, 100 runs, bubble (partially sorted 90%), elapsed time: 0.699 ms
+
+1000 elements, 100 runs, quick (reversed), elapsed time: 1.296 ms
+1000 elements, 100 runs, quick (random), elapsed time: 0.065 ms
+1000 elements, 100 runs, quick (partially sorted 10%), elapsed time: 0.091 ms
+1000 elements, 100 runs, quick (partially sorted 30%), elapsed time: 0.155 ms
+1000 elements, 100 runs, quick (partially sorted 50%), elapsed time: 0.234 ms
+1000 elements, 100 runs, quick (partially sorted 70%), elapsed time: 0.329 ms
+1000 elements, 100 runs, quick (partially sorted 90%), elapsed time: 0.436 ms
+
+10000 elements, 10 runs, bubble (reversed), elapsed time: 128.348 ms
+10000 elements, 10 runs, bubble (random), elapsed time: 152.583 ms
+10000 elements, 10 runs, bubble (partially sorted 10%), elapsed time: 87.626 ms
+10000 elements, 10 runs, bubble (partially sorted 30%), elapsed time: 77.754 ms
+10000 elements, 10 runs, bubble (partially sorted 50%), elapsed time: 74.588 ms
+10000 elements, 10 runs, bubble (partially sorted 70%), elapsed time: 72.863 ms
+10000 elements, 10 runs, bubble (partially sorted 90%), elapsed time: 72.023 ms
+
+10000 elements, 10 runs, quick (reversed), elapsed time: 122.538 ms
+10000 elements, 10 runs, quick (random), elapsed time: 0.875 ms
+10000 elements, 10 runs, quick (partially sorted 10%), elapsed time: 1.542 ms
+10000 elements, 10 runs, quick (partially sorted 30%), elapsed time: 2.303 ms
+10000 elements, 10 runs, quick (partially sorted 50%), elapsed time: 2.956 ms
+10000 elements, 10 runs, quick (partially sorted 70%), elapsed time: 3.291 ms
+10000 elements, 10 runs, quick (partially sorted 90%), elapsed time: 3.865 ms
