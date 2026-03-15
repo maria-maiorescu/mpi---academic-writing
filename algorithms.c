@@ -73,6 +73,8 @@ static const char* ALGORITHM_NAMES[] = {
     "radix sort"
 };
 
+static FILE* resultsFile = NULL;
+
 void resetRandomSeed() { srand((unsigned int)time(NULL)); }
 
 clock_t startOperationTimer() { return clock(); }
@@ -361,8 +363,19 @@ double measureSortAlg(int type, int* data, unsigned long size) {
 
 void printHeader() {
     printf("Elements, Runs, Algorithm, Variant, Elapsed time(ms)\n");
-
 }
+
+void writeResultRow(unsigned long size, int count, const char* algorithmName, const char* variant, double elapsedMs) {
+    char line[256];
+
+    sprintf(line, "%lu, %d, %s, %s, %.3f", size, count, algorithmName, variant, elapsedMs);    
+
+    printf("%s\n", line);
+    if (resultsFile) {
+        fprintf(resultsFile, "%s\n", line);
+    }
+}
+
 
 void analyzeSortAlg(int type, unsigned long size, int count) {
     double elapsedMs, sumMs;
@@ -376,8 +389,9 @@ void analyzeSortAlg(int type, unsigned long size, int count) {
         sumMs += measureSortAlg(type, x, size);
         free(x);
     }
+
     elapsedMs = sumMs/count;
-    printf("%lu, %d, %s, reversed, %.3f\n", size, count, algorithmName, elapsedMs);
+    writeResultRow(size, count, algorithmName, "reversed", elapsedMs);
   
     // random data
     sumMs = 0;
@@ -386,9 +400,10 @@ void analyzeSortAlg(int type, unsigned long size, int count) {
         sumMs += measureSortAlg(type, x, size);
         free(x);
     }
+
     elapsedMs = sumMs/count;
-    printf("%lu, %d, %s, random, %.3f\n", size, count, algorithmName, elapsedMs);
-    
+    writeResultRow(size, count, algorithmName, "random", elapsedMs);
+
     // partially sorted
     for (int factor = 10; factor <= 100; factor += 20) {
         sumMs = 0;
@@ -397,9 +412,11 @@ void analyzeSortAlg(int type, unsigned long size, int count) {
             sumMs += measureSortAlg(type, x, size);
             free(x);
         }
+
         elapsedMs = sumMs/count;
-        printf("%lu, %d, %s, partially sorted %d%%, %.3f\n", size, count, algorithmName, factor, elapsedMs);
-        
+        char variantType[50];
+        sprintf(variantType, "partially sorted %d%%", factor );
+        writeResultRow(size, count, algorithmName, variantType, elapsedMs);
     }
     printf("\n");
 }
@@ -415,16 +432,20 @@ void analyzeAlgo(unsigned long size, int count) {
 
 int main() {
     resetRandomSeed();
+    /* open results file once (append) and keep it open until program end */
+    resultsFile = fopen("results.csv", "a");
 
     printHeader();
 
     analyzeAlgo(10, 1000000);
-   // analyzeAlgo(50, 1000000);
-    //analyzeAlgo(100, 1000000);
-    //analyzeAlgo(1000, 100);
-    //analyzeAlgo(10000, 10);
-    //analyzeBubbleSort(100000);
-    // analyzeBubbleSort(1000000);
+    analyzeAlgo(50, 1000000);
+    analyzeAlgo(100, 1000000);
+    analyzeAlgo(1000, 100);
+    analyzeAlgo(10000, 10);
+    // analyzeAlgo(100000, 1);
+    // analyzeAlgo(1000000);
+
+    fclose(resultsFile);
 
     return 0;
 }
