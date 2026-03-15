@@ -2,7 +2,6 @@
 
 Make an experimental comparison of some* sorting algorithms.
 
-*
 the sorting algorithms included in the comparison must include, at the
 minimum, all those which were studied in the Algorithms and Data
 Structures 1 lecture, but the recommendation is to also include other
