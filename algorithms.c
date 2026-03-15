@@ -59,14 +59,18 @@ TO DO:
 
 #define BUBBLE_SORT 0
 #define QUICK_SORT 1
+#define INSERTION_SORT 2
+#define SELECTION_SORT 3
+#define MERGE_SORT 4
+#define RADIX_SORT 5
 
 static const char* ALGORITHM_NAMES[] = {
     "bubble sort",
     "quick sort",
-   // "insertion sort",
-   // "selection sort",
-    // "merge sort",
-    // "radix sort"
+    "insertion sort",
+    "selection sort",
+    "merge sort",
+    "radix sort"
 };
 
 void resetRandomSeed() { srand((unsigned int)time(NULL)); }
@@ -184,17 +188,168 @@ void quickSort(int* array, unsigned long size) {
     quickSortRecursive(array, 0, (long)size - 1);
 }
 
+void insertionSort(int* array, unsigned long size) {
+    if (array == NULL || size < 2) {
+        return;
+    }
+
+    for (unsigned long i = 1; i < size; i++) {
+        int key = array[i];
+        long j = (long)i - 1;
+
+        while (j >= 0 && array[j] > key) {
+            array[j + 1] = array[j];
+            j--;
+        }
+
+        array[j + 1] = key;
+    }
+}
+
+void selectionSort(int* array, unsigned long size) {
+    if (array == NULL || size < 2) {
+        return;
+    }
+
+    for (unsigned long i = 0; i < size - 1; i++) {
+        unsigned long minIndex = i;
+        for (unsigned long j = i + 1; j < size; j++) {
+            if (array[j] < array[minIndex]) {
+                minIndex = j;
+            }
+        }
+
+        if (minIndex != i) {
+            swapInts(&array[i], &array[minIndex]);
+        }
+    }
+}
+
+void merge(int* array, unsigned long left, unsigned long mid, unsigned long right) {
+    unsigned long n1 = mid - left + 1;
+    unsigned long n2 = right - mid;
+
+    int* L = malloc(sizeof(int) * n1);
+    int* R = malloc(sizeof(int) * n2);
+    if (L == NULL || R == NULL) {
+        free(L);
+        free(R);
+        return;
+    }
+
+    for (unsigned long i = 0; i < n1; i++) {
+        L[i] = array[left + i];
+    }
+    for (unsigned long j = 0; j < n2; j++) {
+        R[j] = array[mid + 1 + j];
+    }
+
+    unsigned long i = 0, j = 0, k = left;
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j]) {
+            array[k++] = L[i++];
+        } else {
+            array[k++] = R[j++];
+        }
+    }
+
+    while (i < n1) {
+        array[k++] = L[i++];
+    }
+
+    while (j < n2) {
+        array[k++] = R[j++];
+    }
+
+    free(L);
+    free(R);
+}
+
+void mergeSortRecursive(int* array, long left, long right) {
+    if (left < right) {
+        long mid = left + (right - left) / 2;
+        mergeSortRecursive(array, left, mid);
+        mergeSortRecursive(array, mid + 1, right);
+        merge(array, (unsigned long)left, (unsigned long)mid, (unsigned long)right);
+    }
+}
+
+void mergeSort(int* array, unsigned long size) {
+    if (array == NULL || size < 2) {
+        return;
+    }
+
+    mergeSortRecursive(array, 0, (long)size - 1);
+}
+
+int getMaxValue(int* array, unsigned long size) {
+    int mx = array[0];
+    for (unsigned long i = 1; i < size; i++) {
+        if (array[i] > mx) mx = array[i];
+    }
+    return mx;
+}
+
+void countSortByDigit(int* array, unsigned long size, int exp) {
+    if (size == 0) return;
+
+    int* output = malloc(sizeof(int) * size);
+    if (output == NULL) return;
+
+    int count[10] = {0};
+
+    for (unsigned long i = 0; i < size; i++) {
+        int digit = (array[i] / exp) % 10;
+        count[digit]++;
+    }
+
+    for (int i = 1; i < 10; i++) {
+        count[i] += count[i - 1];
+    }
+
+    for (long i = (long)size - 1; i >= 0; i--) {
+        int digit = (array[i] / exp) % 10;
+        output[count[digit] - 1] = array[i];
+        count[digit]--;
+    }
+
+    for (unsigned long i = 0; i < size; i++) {
+        array[i] = output[i];
+    }
+
+    free(output);
+}
+
+void radixSort(int* array, unsigned long size) {
+    if (array == NULL || size < 2) return;
+
+    int m = getMaxValue(array, size);
+    for (int exp = 1; m / exp > 0; exp *= 10) {
+        countSortByDigit(array, size, exp);
+    }
+}
+
 double measureSortAlg(int type, int* data, unsigned long size) {
     clock_t startTime = startOperationTimer();
     switch (type) {
         case BUBBLE_SORT:
             bubbleSort(data, size);
-            break;
-        
+            break; 
         case QUICK_SORT:
             quickSort(data, size);
             break;
-        
+        case INSERTION_SORT:
+            insertionSort(data, size);
+            break;
+        case SELECTION_SORT:
+            selectionSort(data, size);
+            break;
+        case MERGE_SORT:
+            mergeSort(data, size);
+            break;
+        case RADIX_SORT:
+            radixSort(data, size);
+            break;
         default:
             printf("not implemented");
     }
@@ -202,6 +357,11 @@ double measureSortAlg(int type, int* data, unsigned long size) {
     double elapsedMs = stopOperationTimerMs(startTime);
 
     return elapsedMs;
+}
+
+void printHeader() {
+    printf("Elements, Runs, Algorithm, Variant, Elapsed time(ms)\n");
+
 }
 
 void analyzeSortAlg(int type, unsigned long size, int count) {
@@ -217,7 +377,7 @@ void analyzeSortAlg(int type, unsigned long size, int count) {
         free(x);
     }
     elapsedMs = sumMs/count;
-    printf("%lu elements, %d runs, %s (reversed), elapsed time: %.3f ms\n", size, count, algorithmName, elapsedMs);
+    printf("%lu, %d, %s, reversed, %.3f\n", size, count, algorithmName, elapsedMs);
   
     // random data
     sumMs = 0;
@@ -227,9 +387,8 @@ void analyzeSortAlg(int type, unsigned long size, int count) {
         free(x);
     }
     elapsedMs = sumMs/count;
-    printf("%lu elements, %d runs, %s (random), elapsed time: %.3f ms\n", size, count, algorithmName, elapsedMs);
+    printf("%lu, %d, %s, random, %.3f\n", size, count, algorithmName, elapsedMs);
     
-
     // partially sorted
     for (int factor = 10; factor <= 100; factor += 20) {
         sumMs = 0;
@@ -239,7 +398,7 @@ void analyzeSortAlg(int type, unsigned long size, int count) {
             free(x);
         }
         elapsedMs = sumMs/count;
-        printf("%lu elements, %d runs, %s (partially sorted %d%%), elapsed time: %.3f ms\n", size, count, algorithmName, factor, elapsedMs);
+        printf("%lu, %d, %s, partially sorted %d%%, %.3f\n", size, count, algorithmName, factor, elapsedMs);
         
     }
     printf("\n");
@@ -248,16 +407,22 @@ void analyzeSortAlg(int type, unsigned long size, int count) {
 void analyzeAlgo(unsigned long size, int count) {
     analyzeSortAlg(BUBBLE_SORT, size, count);
     analyzeSortAlg(QUICK_SORT, size, count);
+    analyzeSortAlg(INSERTION_SORT, size, count);
+    analyzeSortAlg(SELECTION_SORT, size, count);
+    analyzeSortAlg(MERGE_SORT, size, count);
+    analyzeSortAlg(RADIX_SORT, size, count);
 }
 
 int main() {
     resetRandomSeed();
 
+    printHeader();
+
     analyzeAlgo(10, 1000000);
-    analyzeAlgo(50, 1000000);
-    analyzeAlgo(100, 1000000);
-    analyzeAlgo(1000, 100);
-    analyzeAlgo(10000, 10);
+   // analyzeAlgo(50, 1000000);
+    //analyzeAlgo(100, 1000000);
+    //analyzeAlgo(1000, 100);
+    //analyzeAlgo(10000, 10);
     //analyzeBubbleSort(100000);
     // analyzeBubbleSort(1000000);
 
