@@ -1,0 +1,357 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\title{Experimental Study of Sorting Algorithm Performance}
+\author{Maria Maiorescu \\[4pt]
+\small{Year 1, Computer Science} \\
+\small{West University of Timișoara}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This paper compares six sorting algorithms implemented in C: bubble sort, quick sort, insertion sort, selection sort, merge sort, and radix sort. The code in \texttt{algorithms.c} generates integer arrays with different patterns and measures average sorting time. The measured values are taken from \texttt{results.csv}. We compare theoretical Big-O complexity predictions with empirically measured results.
+\end{abstract}
+
+\section{Introduction}
+Sorting is one of the most common tasks in computer science. Different sorting algorithms have different speeds and behave differently depending on the input \cite{cormen2009,sedgewick2011}. The goal of this study is to analyze how algorithm type and input pattern affect running time.
+
+The study analyzes:
+\begin{itemize}
+    \item algorithm category (\(O(n^2)\), \(O(n\log n)\), and radix-based),
+    \item input size,
+    \item input variant (reversed, random, and partially sorted).
+\end{itemize}
+
+\section{Experimental Setup}
+The experiment is implemented in \texttt{algorithms.c}. For each test case, the program creates a new integer array, sorts it, measures the time with \texttt{clock()}, and then frees the memory.
+
+\subsection{Algorithms}
+The following algorithms are implemented:
+\begin{itemize}
+    \item \textbf{bubble sort}: compares neighbors and swaps them if needed; easy to understand, but slow for big arrays,
+    \item \textbf{quick sort} (last element as pivot): splits the array around a pivot and sorts the two parts,
+    \item \textbf{insertion sort}: builds a sorted part from left to right by inserting each new element,
+    \item \textbf{selection sort}: repeatedly finds the smallest value and puts it in the next correct position,
+    \item \textbf{merge sort}: splits the array into smaller parts, sorts them, then merges them,
+    \item \textbf{radix sort} (base-10 counting by digit): sorts integers digit by digit.
+\end{itemize}
+
+These algorithms were chosen because they use different ideas, so we can compare both theory and real measured performance.
+
+\subsection{Input Data Generation}
+The program generates integer arrays in these variants:
+\begin{itemize}
+    \item \textbf{reversed}: strictly descending sequence,
+    \item \textbf{random}: uniformly generated integers in \([0, n]\),
+    \item \textbf{partially sorted}: initially sorted sequence followed by random swaps.
+\end{itemize}
+
+For partially sorted arrays, factors \(10\%, 30\%, 50\%, 70\%, 90\%\) are used in the labels. Higher percentages mean the array is closer to already sorted.
+
+\subsection{Sizes and Number of Runs}
+The exact experiment configuration used in \texttt{main()} is:
+\begin{itemize}
+    \item \(n=10\), runs \(=1{,}000{,}000\)
+    \item \(n=50\), runs \(=1{,}000{,}000\)
+    \item \(n=100\), runs \(=1{,}000{,}000\)
+    \item \(n=1000\), runs \(=100\)
+    \item \(n=10000\), runs \(=10\)
+\end{itemize}
+
+The reported values are average elapsed time in milliseconds.
+
+\section{Theoretical Complexity (Big-O)}
+Table~\ref{tab:complexity} summarizes expected complexity based on standard algorithm analysis \cite{cormen2009,knuth1998}.
+
+Big-O tells us how the running time should grow when \(n\) gets larger. The measured times show what happens in practice, including effects from implementation details such as pivot choice and memory allocation.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{>{\raggedright\arraybackslash}p{3cm}ccc>{\raggedright\arraybackslash}p{3cm}}
+\toprule
+Algorithm & Best & Average & Worst & Extra Space \\
+\midrule
+Bubble Sort & \(O(n)\) & \(O(n^2)\) & \(O(n^2)\) & \(O(1)\) \\
+Insertion Sort & \(O(n)\) & \(O(n^2)\) & \(O(n^2)\) & \(O(1)\) \\
+Selection Sort & \(O(n^2)\) & \(O(n^2)\) & \(O(n^2)\) & \(O(1)\) \\
+Quick Sort & \(O(n\log n)\) & \(O(n\log n)\) & \(O(n^2)\) & \(O(\log n)\) stack \\
+Merge Sort & \(O(n\log n)\) & \(O(n\log n)\) & \(O(n\log n)\) & \(O(n)\) \\
+Radix Sort & \(O(d(n+b))\) & \(O(d(n+b))\) & \(O(d(n+b))\) & \(O(n+b)\) \\
+\bottomrule
+\end{tabular}
+\caption{Theoretical complexity comparison. Here, \(d\) is number of digits and \(b\) is base/range per digit pass.}
+\label{tab:complexity}
+\end{table}
+
+\section{Experimental Results from \texttt{results.csv}}
+The next tables present measured average times (ms), split by algorithm type, input variant, and input size: bubble sort (Table~\ref{tab:bubble-results}), quick sort (Table~\ref{tab:quick-results}), insertion sort (Table~\ref{tab:insertion-results}), selection sort (Table~\ref{tab:selection-results}), merge sort (Table~\ref{tab:merge-results}), and radix sort (Table~\ref{tab:radix-results}).
+
+\subsection{Bubble Sort}
+\begin{table}[H]
+\centering
+\begin{tabular}{lccccc}
+\toprule
+Variant & 10 & 50 & 100 & 1000 & 10000 \\
+\midrule
+reversed & 0.001 & 0.010 & 0.037 & 3.711 & 361.338 \\
+random & 0.001 & 0.013 & 0.047 & 3.120 & 310.295 \\
+partially sorted 10\% & 0.001 & 0.007 & 0.027 & 2.537 & 254.257 \\
+partially sorted 30\% & 0.001 & 0.004 & 0.020 & 2.353 & 245.054 \\
+partially sorted 50\% & 0.001 & 0.004 & 0.017 & 2.264 & 236.306 \\
+partially sorted 70\% & 0.001 & 0.004 & 0.013 & 2.176 & 232.797 \\
+partially sorted 90\% & 0.001 & 0.004 & 0.013 & 2.169 & 230.022 \\
+\bottomrule
+\end{tabular}
+\caption{Bubble sort average elapsed time (ms) by input variant and size.}
+\label{tab:bubble-results}
+\end{table}
+
+Bubble sort clearly gets much slower when \(n\) increases from \(1000\) to \(10000\). It is a bit faster on partially sorted data because the code stops early if no swaps are needed in a pass. Even so, it is still slow for large arrays.
+
+\subsection{Quick Sort}
+\begin{table}[H]
+\centering
+\begin{tabular}{lccccc}
+\toprule
+Variant & 10 & 50 & 100 & 1000 & 10000 \\
+\midrule
+reversed & 0.001 & 0.010 & 0.036 & 3.215 & 312.116 \\
+random & 0.001 & 0.005 & 0.011 & 0.160 & 2.140 \\
+partially sorted 10\% & 0.001 & 0.007 & 0.015 & 0.217 & 3.103 \\
+partially sorted 30\% & 0.001 & 0.010 & 0.028 & 0.367 & 5.100 \\
+partially sorted 50\% & 0.001 & 0.010 & 0.032 & 0.622 & 9.882 \\
+partially sorted 70\% & 0.001 & 0.010 & 0.037 & 0.780 & 7.438 \\
+partially sorted 90\% & 0.001 & 0.010 & 0.037 & 1.052 & 10.578 \\
+\bottomrule
+\end{tabular}
+\caption{Quick sort average elapsed time (ms) by input variant and size.}
+\label{tab:quick-results}
+\end{table}
+
+Quick sort is very fast on random input, which matches the expected average \(O(n\log n)\) time. But it is much slower on reversed and nearly ordered inputs in this experiment. The reason is the pivot choice: using the last element can create very uneven splits, leading toward worst-case \(O(n^2)\).
+
+\subsection{Insertion Sort}
+\begin{table}[H]
+\centering
+\begin{tabular}{lccccc}
+\toprule
+Variant & 10 & 50 & 100 & 1000 & 10000 \\
+\midrule
+reversed & 0.001 & 0.007 & 0.025 & 2.385 & 235.495 \\
+random & 0.001 & 0.005 & 0.015 & 1.209 & 118.386 \\
+partially sorted 10\% & 0.001 & 0.002 & 0.005 & 0.292 & 27.537 \\
+partially sorted 30\% & 0.001 & 0.001 & 0.002 & 0.109 & 9.985 \\
+partially sorted 50\% & 0.001 & 0.001 & 0.002 & 0.069 & 6.381 \\
+partially sorted 70\% & 0.001 & 0.001 & 0.001 & 0.052 & 4.604 \\
+partially sorted 90\% & 0.001 & 0.001 & 0.001 & 0.042 & 3.688 \\
+\bottomrule
+\end{tabular}
+\caption{Insertion sort average elapsed time (ms) by input variant and size.}
+\label{tab:insertion-results}
+\end{table}
+
+Insertion sort depends a lot on how sorted the input already is. For random and reversed arrays it becomes slow at large \(n\), but for partially sorted arrays it is much faster. This matches what we learn in class about insertion sort.
+
+\subsection{Selection Sort}
+\begin{table}[H]
+\centering
+\begin{tabular}{lccccc}
+\toprule
+Variant & 10 & 50 & 100 & 1000 & 10000 \\
+\midrule
+reversed & 0.001 & 0.006 & 0.023 & 2.093 & 206.273 \\
+random & 0.001 & 0.009 & 0.031 & 2.388 & 230.297 \\
+partially sorted 10\% & 0.001 & 0.007 & 0.026 & 2.347 & 233.828 \\
+partially sorted 30\% & 0.001 & 0.007 & 0.026 & 2.345 & 239.237 \\
+partially sorted 50\% & 0.001 & 0.007 & 0.026 & 2.345 & 235.613 \\
+partially sorted 70\% & 0.001 & 0.007 & 0.025 & 2.346 & 235.761 \\
+partially sorted 90\% & 0.001 & 0.007 & 0.026 & 2.363 & 234.586 \\
+\bottomrule
+\end{tabular}
+\caption{Selection sort average elapsed time (ms) by input variant and size.}
+\label{tab:selection-results}
+\end{table}
+
+Selection sort has similar times for all input variants of the same size. This is expected because it always scans the remaining unsorted part to find the minimum. Its running time increases strongly with \(n\), as expected for \(O(n^2)\).
+
+\subsection{Merge Sort}
+\begin{table}[H]
+\centering
+\begin{tabular}{lccccc}
+\toprule
+Variant & 10 & 50 & 100 & 1000 & 10000 \\
+\midrule
+reversed & 0.001 & 0.005 & 0.010 & 0.124 & 1.481 \\
+random & 0.001 & 0.007 & 0.016 & 0.214 & 2.778 \\
+partially sorted 10\% & 0.001 & 0.005 & 0.012 & 0.150 & 1.928 \\
+partially sorted 30\% & 0.001 & 0.005 & 0.011 & 0.138 & 1.709 \\
+partially sorted 50\% & 0.001 & 0.005 & 0.010 & 0.135 & 1.671 \\
+partially sorted 70\% & 0.001 & 0.005 & 0.010 & 0.129 & 1.685 \\
+partially sorted 90\% & 0.001 & 0.005 & 0.010 & 0.130 & 1.660 \\
+\bottomrule
+\end{tabular}
+\caption{Merge sort average elapsed time (ms) by input variant and size.}
+\label{tab:merge-results}
+\end{table}
+
+Merge sort has stable times across variants, with small differences between random, reversed, and partially sorted inputs. This is consistent with \(O(n\log n)\). It scales well compared to quadratic algorithms.
+
+\subsection{Radix Sort}
+\begin{table}[H]
+\centering
+\begin{tabular}{lccccc}
+\toprule
+Variant & 10 & 50 & 100 & 1000 & 10000 \\
+\midrule
+reversed & 0.001 & 0.003 & 0.005 & 0.066 & 0.856 \\
+random & 0.001 & 0.003 & 0.007 & 0.103 & 1.010 \\
+partially sorted 10\% & 0.001 & 0.003 & 0.005 & 0.087 & 0.913 \\
+partially sorted 30\% & 0.001 & 0.003 & 0.005 & 0.065 & 0.926 \\
+partially sorted 50\% & 0.001 & 0.003 & 0.005 & 0.065 & 0.855 \\
+partially sorted 70\% & 0.001 & 0.003 & 0.005 & 0.066 & 0.866 \\
+partially sorted 90\% & 0.001 & 0.003 & 0.005 & 0.067 & 0.851 \\
+\bottomrule
+\end{tabular}
+\caption{Radix sort average elapsed time (ms) by input variant and size.}
+\label{tab:radix-results}
+\end{table}
+
+Radix sort is the fastest in most medium and large tests. Since it sorts integers digit by digit, its time is close to linear for these value ranges. Input order matters less than for comparison-based sorts.
+
+\subsection{Overall Comparison}
+
+Figure~\ref{fig:comparison-random} plots all six algorithms on random input using a log--log scale, making it easy to see how sharply the $O(n^2)$ group diverges from the efficient algorithms as $n$ grows.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{loglogaxis}[
+    width=0.88\textwidth,
+    height=7.5cm,
+    xlabel={Input size $n$},
+    ylabel={Average time (ms)},
+    xtick={10,50,100,1000,10000},
+    xticklabels={10,50,100,1000,10000},
+    legend pos=north west,
+    legend style={font=\small},
+    grid=major,
+    mark size=2.5pt,
+    title={All Algorithms on Random Input (log--log scale)}
+]
+\addplot[mark=*,thick]                  coordinates {(10,0.001)(50,0.013)(100,0.047)(1000,3.120)(10000,310.295)};
+\addlegendentry{Bubble sort}
+\addplot[mark=square*,thick]            coordinates {(10,0.001)(50,0.005)(100,0.011)(1000,0.160)(10000,2.140)};
+\addlegendentry{Quick sort}
+\addplot[mark=triangle*,thick]          coordinates {(10,0.001)(50,0.005)(100,0.015)(1000,1.209)(10000,118.386)};
+\addlegendentry{Insertion sort}
+\addplot[mark=diamond*,thick]           coordinates {(10,0.001)(50,0.009)(100,0.031)(1000,2.388)(10000,230.297)};
+\addlegendentry{Selection sort}
+\addplot[mark=pentagon*,thick]          coordinates {(10,0.001)(50,0.007)(100,0.016)(1000,0.214)(10000,2.778)};
+\addlegendentry{Merge sort}
+\addplot[mark=otimes*,thick]            coordinates {(10,0.001)(50,0.003)(100,0.007)(1000,0.103)(10000,1.010)};
+\addlegendentry{Radix sort}
+\end{loglogaxis}
+\end{tikzpicture}
+\caption{Average elapsed time (ms) vs.\ input size $n$ for all six algorithms on random input (log--log scale). The $O(n^2)$ algorithms (bubble, insertion, selection) diverge steeply, while merge sort and radix sort remain fast at large $n$.}
+\label{fig:comparison-random}
+\end{figure}
+
+\section{Discussion: Expected vs. Observed Behavior}
+\subsection{Main Trends}
+The results confirm the expected classes of behavior:
+\begin{itemize}
+    \item Bubble, insertion, and selection sorts get slow quickly as \(n\) grows, as expected for \(O(n^2)\) (Tables~\ref{tab:bubble-results}, \ref{tab:insertion-results}, and \ref{tab:selection-results}).
+    \item Merge sort stays fast and stable for all variants, matching \(O(n\log n)\) (Table~\ref{tab:merge-results}).
+    \item Radix sort is the fastest in this integer experiment, with near-linear behavior (Table~\ref{tab:radix-results}).
+\end{itemize}
+
+\subsection{Input Variant Sensitivity}
+\begin{itemize}
+    \item Insertion sort strongly benefits from partially sorted data (e.g., \(n=10000\): 118.386 ms on random vs. 3.688 ms on 90\% partially sorted; see Table~\ref{tab:insertion-results}).
+    \item Selection sort changes very little across variants because it always does almost the same work (Table~\ref{tab:selection-results}).
+    \item Quick sort is sensitive to reversed and nearly sorted data in this implementation (Table~\ref{tab:quick-results}).
+\end{itemize}
+
+Figure~\ref{fig:insertion-variants} illustrates the effect of input ordering on insertion sort at $n=10{,}000$ in more detail.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    width=0.88\textwidth,
+    height=7cm,
+    xlabel={Input variant},
+    ylabel={Average time (ms)},
+    symbolic x coords={reversed, random, 10\%, 30\%, 50\%, 70\%, 90\%},
+    xtick=data,
+    x tick label style={rotate=30, anchor=east, font=\small},
+    nodes near coords,
+    every node near coord/.append style={font=\tiny, rotate=90, anchor=west},
+    bar width=22pt,
+    grid=major,
+    ymin=0,
+    title={Insertion Sort at $n=10{,}000$: Time by Input Variant}
+]
+\addplot coordinates {
+    (reversed,  235.495)
+    (random,    118.386)
+    (10\%,       27.537)
+    (30\%,        9.985)
+    (50\%,        6.381)
+    (70\%,        4.604)
+    (90\%,        3.688)
+};
+\end{axis}
+\end{tikzpicture}
+\caption{Insertion sort average elapsed time (ms) at $n=10{,}000$ for each input variant. The percentage label indicates the degree of pre-sortedness of the array (higher = more sorted). The time drops dramatically as the array becomes more ordered, confirming the $O(n)$ best-case behaviour.}
+\label{fig:insertion-variants}
+\end{figure}
+
+\subsection{Why Quick Sort Degrades Here}
+In \texttt{algorithms.c}, quick sort uses the \emph{last element} as pivot. For sorted or reversed arrays, this often creates one very small part and one very large part. Then quick sort behaves closer to worst-case \(O(n^2)\). This explains the big gap at \(n=10000\): 2.140 ms (random) vs. 312.116 ms (reversed).
+
+\subsection{Measurement Notes}
+For very small arrays (\(n=10,50,100\)), many values are near timer precision (often 0.001 ms), so small differences are not very reliable. For larger arrays (\(n=1000,10000\)), the trends are clearer.
+
+\section{Conclusion}
+This study shows that practical performance follows theoretical complexity in most cases:
+\begin{itemize}
+    \item \(O(n^2)\) algorithms are acceptable only for small inputs.
+    \item Merge sort and radix sort are reliable and fast for larger inputs.
+    \item Quick sort can be very fast on random input but can become slow on ordered input with a simple pivot choice.
+\end{itemize}
+
+Choosing a sorting algorithm should therefore depend on both \textbf{input size} and \textbf{input pattern}. A better pivot strategy for quick sort (such as a random or median-of-three pivot) would make its performance more consistent across input types.
+
+\begin{thebibliography}{9}
+
+\bibitem{cormen2009}
+Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, and Clifford Stein.
+\textit{Introduction to Algorithms}.
+3rd ed., MIT Press, 2009.
+
+\bibitem{knuth1998}
+Donald E. Knuth.
+\textit{The Art of Computer Programming, Volume 3: Sorting and Searching}.
+2nd ed., Addison-Wesley, 1998.
+
+\bibitem{sedgewick2011}
+Robert Sedgewick and Kevin Wayne.
+\textit{Algorithms}.
+4th ed., Addison-Wesley, 2011.
+
+\end{thebibliography}
+
+\end{document}
