@@ -208,3 +208,55 @@
 10000, 10, radix sort, partially sorted 50%, 0.855
 10000, 10, radix sort, partially sorted 70%, 0.866
 10000, 10, radix sort, partially sorted 90%, 0.851
+
+100000, 1, bubble sort, reversed, 13228.117
+100000, 1, bubble sort, random, 18520.945
+100000, 1, bubble sort, partially sorted 10%, 9423.954
+100000, 1, bubble sort, partially sorted 30%, 8105.251
+100000, 1, bubble sort, partially sorted 50%, 7537.942
+100000, 1, bubble sort, partially sorted 70%, 7643.391
+100000, 1, bubble sort, partially sorted 90%, 7640.430
+100000, 1, quick sort, reversed, 12725.631
+100000, 1, quick sort, random, 10.412
+100000, 1, quick sort, partially sorted 10%, 14.681
+100000, 1, quick sort, partially sorted 30%, 17.405
+100000, 1, quick sort, partially sorted 50%, 41.464
+100000, 1, quick sort, partially sorted 70%, 50.374
+100000, 1, quick sort, partially sorted 90%, 72.064
+100000, 1, insertion sort, reversed, 8343.083
+100000, 1, insertion sort, random, 4198.798
+100000, 1, insertion sort, partially sorted 10%, 985.757
+100000, 1, insertion sort, partially sorted 30%, 342.495
+100000, 1, insertion sort, partially sorted 50%, 222.384
+100000, 1, insertion sort, partially sorted 70%, 165.761
+100000, 1, insertion sort, partially sorted 90%, 122.072
+100000, 1, selection sort, reversed, 7143.945
+100000, 1, selection sort, random, 6847.988
+100000, 1, selection sort, partially sorted 10%, 6856.536
+100000, 1, selection sort, partially sorted 30%, 6747.636
+100000, 1, selection sort, partially sorted 50%, 6656.085
+100000, 1, selection sort, partially sorted 70%, 6655.227
+100000, 1, selection sort, partially sorted 90%, 6765.990
+100000, 1, merge sort, reversed, 20.611
+100000, 1, merge sort, random, 28.249
+100000, 1, merge sort, partially sorted 10%, 23.177
+100000, 1, merge sort, partially sorted 30%, 22.078
+100000, 1, merge sort, partially sorted 50%, 22.141
+100000, 1, merge sort, partially sorted 70%, 21.452
+100000, 1, merge sort, partially sorted 90%, 21.385
+100000, 1, radix sort, reversed, 5.932
+100000, 1, radix sort, random, 6.419
+100000, 1, radix sort, partially sorted 10%, 5.705
+100000, 1, radix sort, partially sorted 30%, 5.299
+100000, 1, radix sort, partially sorted 50%, 5.285
+100000, 1, radix sort, partially sorted 70%, 5.440
+100000, 1, radix sort, partially sorted 90%, 5.236
+1000000, 1, bubble sort, reversed, 1318478.982
+1000000, 1, bubble sort, random, 1808240.000
+1000000, 1, bubble sort, partially sorted 10%, 929435.363
+1000000, 1, bubble sort, partially sorted 30%, 794225.441
+1000000, 1, bubble sort, partially sorted 50%, 756972.269
+1000000, 1, bubble sort, partially sorted 70%, 738981.413
+1000000, 1, bubble sort, partially sorted 90%, 722407.651
+
+[1]    44727 segmentation fault 

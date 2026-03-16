@@ -65,6 +65,8 @@ The exact experiment configuration used in \texttt{main()} is:
     \item \(n=100\), runs \(=1{,}000{,}000\)
     \item \(n=1000\), runs \(=100\)
     \item \(n=10000\), runs \(=10\)
+    \item \(n=100{,}000\), runs \(=1\)
+    \item \(n=1{,}000{,}000\), runs \(=1\) (partial; execution stopped after bubble sort due to a stack overflow crash)
 \end{itemize}
 
 The reported values are average elapsed time in milliseconds.
@@ -98,83 +100,106 @@ The next tables present measured average times (ms), split by algorithm type, in
 \subsection{Bubble Sort}
 \begin{table}[H]
 \centering
-\begin{tabular}{lccccc}
+\footnotesize
+\begin{tabular}{lcccccc}
 \toprule
-Variant & 10 & 50 & 100 & 1000 & 10000 \\
+Variant & 10 & 50 & 100 & 1000 & 10000 & 100000 \\
 \midrule
-reversed & 0.001 & 0.010 & 0.037 & 3.711 & 361.338 \\
-random & 0.001 & 0.013 & 0.047 & 3.120 & 310.295 \\
-partially sorted 10\% & 0.001 & 0.007 & 0.027 & 2.537 & 254.257 \\
-partially sorted 30\% & 0.001 & 0.004 & 0.020 & 2.353 & 245.054 \\
-partially sorted 50\% & 0.001 & 0.004 & 0.017 & 2.264 & 236.306 \\
-partially sorted 70\% & 0.001 & 0.004 & 0.013 & 2.176 & 232.797 \\
-partially sorted 90\% & 0.001 & 0.004 & 0.013 & 2.169 & 230.022 \\
+reversed & 0.001 & 0.010 & 0.037 & 3.711 & 361.338 & 13228.117 \\
+random & 0.001 & 0.013 & 0.047 & 3.120 & 310.295 & 18520.945 \\
+partially sorted 10\% & 0.001 & 0.007 & 0.027 & 2.537 & 254.257 & 9423.954 \\
+partially sorted 30\% & 0.001 & 0.004 & 0.020 & 2.353 & 245.054 & 8105.251 \\
+partially sorted 50\% & 0.001 & 0.004 & 0.017 & 2.264 & 236.306 & 7537.942 \\
+partially sorted 70\% & 0.001 & 0.004 & 0.013 & 2.176 & 232.797 & 7643.391 \\
+partially sorted 90\% & 0.001 & 0.004 & 0.013 & 2.169 & 230.022 & 7640.430 \\
 \bottomrule
 \end{tabular}
 \caption{Bubble sort average elapsed time (ms) by input variant and size.}
 \label{tab:bubble-results}
 \end{table}
 
-Bubble sort clearly gets much slower when \(n\) increases from \(1000\) to \(10000\). It is a bit faster on partially sorted data because the code stops early if no swaps are needed in a pass. Even so, it is still slow for large arrays.
+\begin{table}[H]
+\centering
+\begin{tabular}{lc}
+\toprule
+Variant & 1{,}000{,}000 \\
+\midrule
+reversed & 1{,}318{,}479 \\
+random & 1{,}808{,}240 \\
+partially sorted 10\% & 929{,}435 \\
+partially sorted 30\% & 794{,}225 \\
+partially sorted 50\% & 756{,}972 \\
+partially sorted 70\% & 738{,}981 \\
+partially sorted 90\% & 722{,}408 \\
+\bottomrule
+\end{tabular}
+\caption{Bubble sort at \(n=1{,}000{,}000\): average elapsed time (ms). Single run. All remaining algorithms crashed before completing at this size (see Section~\ref{sec:notes}).}
+\label{tab:bubble-1m}
+\end{table}
+
+Bubble sort's \(O(n^2)\) scaling is clearly visible: at \(n=100{,}000\) random input takes over 18 seconds, and at \(n=1{,}000{,}000\) it took over 30 minutes (Table~\ref{tab:bubble-1m}). The early-exit optimisation helps on partially sorted data but does not change the fundamental growth rate. After bubble sort completed at \(n=1{,}000{,}000\), the program crashed with a segmentation fault --- the remaining algorithms were not measured at this size.
 
 \subsection{Quick Sort}
 \begin{table}[H]
 \centering
-\begin{tabular}{lccccc}
+\footnotesize
+\begin{tabular}{lcccccc}
 \toprule
-Variant & 10 & 50 & 100 & 1000 & 10000 \\
+Variant & 10 & 50 & 100 & 1000 & 10000 & 100000 \\
 \midrule
-reversed & 0.001 & 0.010 & 0.036 & 3.215 & 312.116 \\
-random & 0.001 & 0.005 & 0.011 & 0.160 & 2.140 \\
-partially sorted 10\% & 0.001 & 0.007 & 0.015 & 0.217 & 3.103 \\
-partially sorted 30\% & 0.001 & 0.010 & 0.028 & 0.367 & 5.100 \\
-partially sorted 50\% & 0.001 & 0.010 & 0.032 & 0.622 & 9.882 \\
-partially sorted 70\% & 0.001 & 0.010 & 0.037 & 0.780 & 7.438 \\
-partially sorted 90\% & 0.001 & 0.010 & 0.037 & 1.052 & 10.578 \\
+reversed & 0.001 & 0.010 & 0.036 & 3.215 & 312.116 & 12725.631 \\
+random & 0.001 & 0.005 & 0.011 & 0.160 & 2.140 & 10.412 \\
+partially sorted 10\% & 0.001 & 0.007 & 0.015 & 0.217 & 3.103 & 14.681 \\
+partially sorted 30\% & 0.001 & 0.010 & 0.028 & 0.367 & 5.100 & 17.405 \\
+partially sorted 50\% & 0.001 & 0.010 & 0.032 & 0.622 & 9.882 & 41.464 \\
+partially sorted 70\% & 0.001 & 0.010 & 0.037 & 0.780 & 7.438 & 50.374 \\
+partially sorted 90\% & 0.001 & 0.010 & 0.037 & 1.052 & 10.578 & 72.064 \\
 \bottomrule
 \end{tabular}
 \caption{Quick sort average elapsed time (ms) by input variant and size.}
 \label{tab:quick-results}
 \end{table}
 
-Quick sort is very fast on random input, which matches the expected average \(O(n\log n)\) time. But it is much slower on reversed and nearly ordered inputs in this experiment. The reason is the pivot choice: using the last element can create very uneven splits, leading toward worst-case \(O(n^2)\).
+Quick sort is very fast on random input, which matches the expected average \(O(n\log n)\) time. But it is much slower on reversed and nearly ordered inputs. The gap is extreme at \(n=100{,}000\): 10.412 ms (random) vs. 12725.631 ms (reversed) --- almost as slow as bubble sort. The reason is the last-element pivot, which creates maximally uneven splits on sorted or reversed input, leading to \(O(n^2)\) behaviour.
 
 \subsection{Insertion Sort}
 \begin{table}[H]
 \centering
-\begin{tabular}{lccccc}
+\footnotesize
+\begin{tabular}{lcccccc}
 \toprule
-Variant & 10 & 50 & 100 & 1000 & 10000 \\
+Variant & 10 & 50 & 100 & 1000 & 10000 & 100000 \\
 \midrule
-reversed & 0.001 & 0.007 & 0.025 & 2.385 & 235.495 \\
-random & 0.001 & 0.005 & 0.015 & 1.209 & 118.386 \\
-partially sorted 10\% & 0.001 & 0.002 & 0.005 & 0.292 & 27.537 \\
-partially sorted 30\% & 0.001 & 0.001 & 0.002 & 0.109 & 9.985 \\
-partially sorted 50\% & 0.001 & 0.001 & 0.002 & 0.069 & 6.381 \\
-partially sorted 70\% & 0.001 & 0.001 & 0.001 & 0.052 & 4.604 \\
-partially sorted 90\% & 0.001 & 0.001 & 0.001 & 0.042 & 3.688 \\
+reversed & 0.001 & 0.007 & 0.025 & 2.385 & 235.495 & 8343.083 \\
+random & 0.001 & 0.005 & 0.015 & 1.209 & 118.386 & 4198.798 \\
+partially sorted 10\% & 0.001 & 0.002 & 0.005 & 0.292 & 27.537 & 985.757 \\
+partially sorted 30\% & 0.001 & 0.001 & 0.002 & 0.109 & 9.985 & 342.495 \\
+partially sorted 50\% & 0.001 & 0.001 & 0.002 & 0.069 & 6.381 & 222.384 \\
+partially sorted 70\% & 0.001 & 0.001 & 0.001 & 0.052 & 4.604 & 165.761 \\
+partially sorted 90\% & 0.001 & 0.001 & 0.001 & 0.042 & 3.688 & 122.072 \\
 \bottomrule
 \end{tabular}
 \caption{Insertion sort average elapsed time (ms) by input variant and size.}
 \label{tab:insertion-results}
 \end{table}
 
-Insertion sort depends a lot on how sorted the input already is. For random and reversed arrays it becomes slow at large \(n\), but for partially sorted arrays it is much faster. This matches what we learn in class about insertion sort.
+Insertion sort's sensitivity to input order is even more visible at \(n=100{,}000\): 4198.798 ms on random input compared to only 122.072 ms on 90\% partially sorted. This confirms the near-linear best case when few elements are out of place.
 
 \subsection{Selection Sort}
 \begin{table}[H]
 \centering
-\begin{tabular}{lccccc}
+\footnotesize
+\begin{tabular}{lcccccc}
 \toprule
-Variant & 10 & 50 & 100 & 1000 & 10000 \\
+Variant & 10 & 50 & 100 & 1000 & 10000 & 100000 \\
 \midrule
-reversed & 0.001 & 0.006 & 0.023 & 2.093 & 206.273 \\
-random & 0.001 & 0.009 & 0.031 & 2.388 & 230.297 \\
-partially sorted 10\% & 0.001 & 0.007 & 0.026 & 2.347 & 233.828 \\
-partially sorted 30\% & 0.001 & 0.007 & 0.026 & 2.345 & 239.237 \\
-partially sorted 50\% & 0.001 & 0.007 & 0.026 & 2.345 & 235.613 \\
-partially sorted 70\% & 0.001 & 0.007 & 0.025 & 2.346 & 235.761 \\
-partially sorted 90\% & 0.001 & 0.007 & 0.026 & 2.363 & 234.586 \\
+reversed & 0.001 & 0.006 & 0.023 & 2.093 & 206.273 & 7143.945 \\
+random & 0.001 & 0.009 & 0.031 & 2.388 & 230.297 & 6847.988 \\
+partially sorted 10\% & 0.001 & 0.007 & 0.026 & 2.347 & 233.828 & 6856.536 \\
+partially sorted 30\% & 0.001 & 0.007 & 0.026 & 2.345 & 239.237 & 6747.636 \\
+partially sorted 50\% & 0.001 & 0.007 & 0.026 & 2.345 & 235.613 & 6656.085 \\
+partially sorted 70\% & 0.001 & 0.007 & 0.025 & 2.346 & 235.761 & 6655.227 \\
+partially sorted 90\% & 0.001 & 0.007 & 0.026 & 2.363 & 234.586 & 6765.990 \\
 \bottomrule
 \end{tabular}
 \caption{Selection sort average elapsed time (ms) by input variant and size.}
@@ -186,17 +211,17 @@ Selection sort has similar times for all input variants of the same size. This i
 \subsection{Merge Sort}
 \begin{table}[H]
 \centering
-\begin{tabular}{lccccc}
+\begin{tabular}{lcccccc}
 \toprule
-Variant & 10 & 50 & 100 & 1000 & 10000 \\
+Variant & 10 & 50 & 100 & 1000 & 10000 & 100000 \\
 \midrule
-reversed & 0.001 & 0.005 & 0.010 & 0.124 & 1.481 \\
-random & 0.001 & 0.007 & 0.016 & 0.214 & 2.778 \\
-partially sorted 10\% & 0.001 & 0.005 & 0.012 & 0.150 & 1.928 \\
-partially sorted 30\% & 0.001 & 0.005 & 0.011 & 0.138 & 1.709 \\
-partially sorted 50\% & 0.001 & 0.005 & 0.010 & 0.135 & 1.671 \\
-partially sorted 70\% & 0.001 & 0.005 & 0.010 & 0.129 & 1.685 \\
-partially sorted 90\% & 0.001 & 0.005 & 0.010 & 0.130 & 1.660 \\
+reversed & 0.001 & 0.005 & 0.010 & 0.124 & 1.481 & 20.611 \\
+random & 0.001 & 0.007 & 0.016 & 0.214 & 2.778 & 28.249 \\
+partially sorted 10\% & 0.001 & 0.005 & 0.012 & 0.150 & 1.928 & 23.177 \\
+partially sorted 30\% & 0.001 & 0.005 & 0.011 & 0.138 & 1.709 & 22.078 \\
+partially sorted 50\% & 0.001 & 0.005 & 0.010 & 0.135 & 1.671 & 22.141 \\
+partially sorted 70\% & 0.001 & 0.005 & 0.010 & 0.129 & 1.685 & 21.452 \\
+partially sorted 90\% & 0.001 & 0.005 & 0.010 & 0.130 & 1.660 & 21.385 \\
 \bottomrule
 \end{tabular}
 \caption{Merge sort average elapsed time (ms) by input variant and size.}
@@ -208,17 +233,17 @@ Merge sort has stable times across variants, with small differences between rand
 \subsection{Radix Sort}
 \begin{table}[H]
 \centering
-\begin{tabular}{lccccc}
+\begin{tabular}{lcccccc}
 \toprule
-Variant & 10 & 50 & 100 & 1000 & 10000 \\
+Variant & 10 & 50 & 100 & 1000 & 10000 & 100000 \\
 \midrule
-reversed & 0.001 & 0.003 & 0.005 & 0.066 & 0.856 \\
-random & 0.001 & 0.003 & 0.007 & 0.103 & 1.010 \\
-partially sorted 10\% & 0.001 & 0.003 & 0.005 & 0.087 & 0.913 \\
-partially sorted 30\% & 0.001 & 0.003 & 0.005 & 0.065 & 0.926 \\
-partially sorted 50\% & 0.001 & 0.003 & 0.005 & 0.065 & 0.855 \\
-partially sorted 70\% & 0.001 & 0.003 & 0.005 & 0.066 & 0.866 \\
-partially sorted 90\% & 0.001 & 0.003 & 0.005 & 0.067 & 0.851 \\
+reversed & 0.001 & 0.003 & 0.005 & 0.066 & 0.856 & 5.932 \\
+random & 0.001 & 0.003 & 0.007 & 0.103 & 1.010 & 6.419 \\
+partially sorted 10\% & 0.001 & 0.003 & 0.005 & 0.087 & 0.913 & 5.705 \\
+partially sorted 30\% & 0.001 & 0.003 & 0.005 & 0.065 & 0.926 & 5.299 \\
+partially sorted 50\% & 0.001 & 0.003 & 0.005 & 0.065 & 0.855 & 5.285 \\
+partially sorted 70\% & 0.001 & 0.003 & 0.005 & 0.066 & 0.866 & 5.440 \\
+partially sorted 90\% & 0.001 & 0.003 & 0.005 & 0.067 & 0.851 & 5.236 \\
 \bottomrule
 \end{tabular}
 \caption{Radix sort average elapsed time (ms) by input variant and size.}
@@ -238,16 +263,18 @@ The results confirm the expected classes of behavior:
 
 \subsection{Input Variant Sensitivity}
 \begin{itemize}
-    \item Insertion sort strongly benefits from partially sorted data (e.g., \(n=10000\): 118.386 ms on random vs. 3.688 ms on 90\% partially sorted; see Table~\ref{tab:insertion-results}).
+    \item Insertion sort strongly benefits from partially sorted data. At \(n=10{,}000\): 118.386 ms (random) vs. 3.688 ms (90\% sorted). At \(n=100{,}000\): 4198.798 ms (random) vs. 122.072 ms (90\% sorted) --- see Table~\ref{tab:insertion-results}.
     \item Selection sort changes very little across variants because it always does almost the same work (Table~\ref{tab:selection-results}).
     \item Quick sort is sensitive to reversed and nearly sorted data in this implementation (Table~\ref{tab:quick-results}).
 \end{itemize}
 
 \subsection{Why Quick Sort Degrades Here}
-In \texttt{algorithms.c}, quick sort uses the \emph{last element} as pivot. For sorted or reversed arrays, this often creates one very small part and one very large part. Then quick sort behaves closer to worst-case \(O(n^2)\). This explains the big gap at \(n=10000\): 2.140 ms (random) vs. 312.116 ms (reversed).
+In \texttt{algorithms.c}, quick sort uses the \emph{last element} as pivot. For sorted or reversed arrays, this always picks the worst possible pivot, creating maximally uneven splits and \(O(n^2)\) behaviour. This gap grows with \(n\): at \(n=10{,}000\): 2.140 ms (random) vs. 312.116 ms (reversed); at \(n=100{,}000\): 10.412 ms (random) vs. 12725.631 ms (reversed). At \(n=1{,}000{,}000\) the recursion stack would be one million levels deep, which is why the program crashed.
 
-\subsection{Measurement Notes}
-For very small arrays (\(n=10,50,100\)), many values are near timer precision (often 0.001 ms), so small differences are not very reliable. For larger arrays (\(n=1000,10000\)), the trends are clearer.
+\subsection{Measurement Notes}\label{sec:notes}
+For very small arrays (\(n=10,50,100\)), many values are near timer precision (often 0.001 ms), so small differences are not very reliable. For larger arrays (\(n=1{,}000\) to \(n=100{,}000\)) the trends are clear and consistent with theory. The \(n=100{,}000\) and \(n=1{,}000{,}000\) runs used a single trial (runs\,=\,1) rather than an average, so those values carry more measurement noise.
+
+At \(n=1{,}000{,}000\), only bubble sort produced results. After it finished, the program crashed with a segmentation fault (exit code 139). The most likely cause is stack overflow in quick sort's recursive implementation: with the last-element pivot on a sorted or reversed input, the recursion depth reaches \(n\), which overflows the default 8\,MB system stack on macOS.
 
 \section{Conclusion}
 This study shows that practical performance follows theoretical complexity in most cases:
