@@ -120,24 +120,24 @@ partially sorted 90\% & 0.001 & 0.004 & 0.013 & 2.169 & 230.022 & 7640.430 \\
 
 \begin{table}[H]
 \centering
-\begin{tabular}{lc}
+\begin{tabular}{lcc}
 \toprule
-Variant & 1{,}000{,}000 \\
+Variant & Time (ms) & Time (min) \\
 \midrule
-reversed & 1{,}318{,}479 \\
-random & 1{,}808{,}240 \\
-partially sorted 10\% & 929{,}435 \\
-partially sorted 30\% & 794{,}225 \\
-partially sorted 50\% & 756{,}972 \\
-partially sorted 70\% & 738{,}981 \\
-partially sorted 90\% & 722{,}408 \\
+reversed & 1{,}318{,}479 & 22.0 \\
+random & 1{,}808{,}240 & 30.1 \\
+partially sorted 10\% & 929{,}435 & 15.5 \\
+partially sorted 30\% & 794{,}225 & 13.2 \\
+partially sorted 50\% & 756{,}972 & 12.6 \\
+partially sorted 70\% & 738{,}981 & 12.3 \\
+partially sorted 90\% & 722{,}408 & 12.0 \\
 \bottomrule
 \end{tabular}
-\caption{Bubble sort at \(n=1{,}000{,}000\): average elapsed time (ms). Single run. All remaining algorithms crashed before completing at this size (see Section~\ref{sec:notes}).}
+\caption{Bubble sort at \(n=1{,}000{,}000\): average elapsed time (ms and min). Single run. All remaining algorithms crashed before completing at this size (see Section~\ref{sec:notes}).}
 \label{tab:bubble-1m}
 \end{table}
 
-Bubble sort's \(O(n^2)\) scaling is clearly visible: at \(n=100{,}000\) random input takes over 18 seconds, and at \(n=1{,}000{,}000\) it took over 30 minutes (Table~\ref{tab:bubble-1m}). The early-exit optimisation helps on partially sorted data but does not change the fundamental growth rate. After bubble sort completed at \(n=1{,}000{,}000\), the program crashed with a segmentation fault --- the remaining algorithms were not measured at this size.
+Bubble sort's \(O(n^2)\) scaling is clearly visible: at \(n=100{,}000\) random input takes over 18 seconds, and at \(n=1{,}000{,}000\) it took over 30 minutes on random input (Table~\ref{tab:bubble-1m}). The early-exit optimisation helps on partially sorted data but does not change the fundamental growth rate. After bubble sort completed at \(n=1{,}000{,}000\), the program crashed with a segmentation fault --- the remaining algorithms were not measured at this size.
 
 \subsection{Quick Sort}
 \begin{table}[H]
@@ -274,7 +274,16 @@ In \texttt{algorithms.c}, quick sort uses the \emph{last element} as pivot. For 
 \subsection{Measurement Notes}\label{sec:notes}
 For very small arrays (\(n=10,50,100\)), many values are near timer precision (often 0.001 ms), so small differences are not very reliable. For larger arrays (\(n=1{,}000\) to \(n=100{,}000\)) the trends are clear and consistent with theory. The \(n=100{,}000\) and \(n=1{,}000{,}000\) runs used a single trial (runs\,=\,1) rather than an average, so those values carry more measurement noise.
 
-At \(n=1{,}000{,}000\), only bubble sort produced results. After it finished, the program crashed with a segmentation fault (exit code 139). The most likely cause is stack overflow in quick sort's recursive implementation: with the last-element pivot on a sorted or reversed input, the recursion depth reaches \(n\), which overflows the default 8\,MB system stack on macOS.
+At \(n=1{,}000{,}000\), only bubble sort produced results. After it finished, the program crashed with a segmentation fault (exit code 139). The cause is a \textbf{stack memory overflow} in the recursive quick sort implementation. Here is why:
+
+\begin{itemize}
+    \item Every recursive function call in C uses a block of memory on the \emph{call stack} to store its local variables, the return address, and saved registers. For \texttt{quickSortRecursive}, each stack frame is roughly 30--50 bytes.
+    \item With the last-element pivot strategy, a reversed or sorted input always creates the worst-case split: one sub-array of size 0 and one of size \(n-1\). This means the recursion goes \(n\) levels deep instead of the expected \(O(\log n)\).
+    \item At \(n = 1{,}000{,}000\), that is one million nested calls. At approximately 40 bytes per frame, this requires around \(40 \times 10^6\) bytes \(= 40\,\text{MB}\) of stack space.
+    \item macOS limits the stack to 8\,MB by default. When the stack exceeds this limit, the operating system sends a segmentation fault signal (\texttt{SIGSEGV}), which terminates the program immediately.
+\end{itemize}
+
+Bubble sort is iterative (no recursion) so it was not affected and completed normally. Merge sort is also recursive, but since it always splits the array in half, its recursion depth is only \(O(\log_2 n) \approx 20\) levels at \(n = 1{,}000{,}000\), which is safe.
 
 \section{Conclusion}
 This study shows that practical performance follows theoretical complexity in most cases:
