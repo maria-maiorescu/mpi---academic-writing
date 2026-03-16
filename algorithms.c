@@ -63,6 +63,7 @@ TO DO:
 #define MERGE_SORT 4
 #define RADIX_SORT 5
 
+/* Display names for each algorithm, indexed by the ALGORITHM constants above. */
 static const char* ALGORITHM_NAMES[] = {
     "bubble sort",
     "quick sort",
@@ -72,17 +73,23 @@ static const char* ALGORITHM_NAMES[] = {
     "radix sort"
 };
 
+/* Output file handle for results.csv. Opened once in main() and shared by all write functions. */
 static FILE* resultsFile = NULL;
 
+/* Seeds the random number generator with the current time so each run produces different data. */
 void resetRandomSeed() { srand((unsigned int)time(NULL)); }
 
+/* Records the current CPU clock tick. Call before the operation you want to time. */
 clock_t startOperationTimer() { return clock(); }
 
+/* Returns the elapsed time in milliseconds since startTime. */
 double stopOperationTimerMs(clock_t startTime) {
     clock_t endTime = clock();
     return ((double)(endTime - startTime) * 1000.0) / CLOCKS_PER_SEC;
 }
 
+/* Allocates and returns an array of `size` random integers in the range [0, size].
+   The caller is responsible for freeing the returned pointer. */
 int* generateIntArray(unsigned long size) {
     int* array;
 
@@ -95,6 +102,11 @@ int* generateIntArray(unsigned long size) {
     return array;
 }
 
+/* Allocates and returns a partially sorted array of `size` integers.
+   Starts as a sorted sequence 0..size-1, then performs size/factor random swaps.
+   A smaller factor means more swaps (less sorted); a larger factor means fewer swaps (more sorted).
+   Example: factor=10 gives ~10% of elements swapped; factor=90 gives ~1% swapped.
+   The caller is responsible for freeing the returned pointer. */
 int* generatePartiallySortedIntArray(unsigned long size, int factor) {
     int* array = malloc(sizeof(int) * size);
 
@@ -119,6 +131,8 @@ int* generatePartiallySortedIntArray(unsigned long size, int factor) {
     return array;
 }
 
+/* Allocates and returns an array of `size` integers in strictly descending order (size-1 down to 0).
+   The caller is responsible for freeing the returned pointer. */
 int* generateReverseSortedIntArray(unsigned long size) {
     int* array = malloc(sizeof(int) * size);
 
@@ -129,6 +143,8 @@ int* generateReverseSortedIntArray(unsigned long size) {
     return array;
 }
 
+/* Sorts array in-place using bubble sort (O(n^2) average/worst, O(n) best).
+   Includes an early-exit optimisation: stops if a full pass produces no swaps. */
 void bubbleSort(int* array, unsigned long size) {
     if (array == NULL || size < 2) {
         return;
@@ -152,12 +168,17 @@ void bubbleSort(int* array, unsigned long size) {
     }
 }
 
+/* Swaps the two integers pointed to by a and b. */
 void swapInts(int* a, int* b) {
     int temp = *a;
     *a = *b;
     *b = temp;
 }
 
+/* Partitions array[low..high] around the last element as pivot.
+   Elements <= pivot are moved to the left; elements > pivot to the right.
+   Returns the final index of the pivot.
+   Note: using the last element as pivot causes O(n^2) behaviour on already sorted or reversed input. */
 long partitionQuickSort(int* array, long low, long high) {
     int pivot = array[high];
     long i = low - 1;
@@ -173,6 +194,7 @@ long partitionQuickSort(int* array, long low, long high) {
     return i + 1;
 }
 
+/* Recursive helper for quickSort. Sorts array[low..high] in-place. */
 void quickSortRecursive(int* array, long low, long high) {
     if (low < high) {
         long pivotIndex = partitionQuickSort(array, low, high);
@@ -181,6 +203,7 @@ void quickSortRecursive(int* array, long low, long high) {
     }
 }
 
+/* Sorts array in-place using quick sort (O(n log n) average, O(n^2) worst with last-element pivot). */
 void quickSort(int* array, unsigned long size) {
     if (array == NULL || size < 2) {
         return;
@@ -189,6 +212,7 @@ void quickSort(int* array, unsigned long size) {
     quickSortRecursive(array, 0, (long)size - 1);
 }
 
+/* Sorts array in-place using insertion sort (O(n^2) average/worst, O(n) best on nearly sorted input). */
 void insertionSort(int* array, unsigned long size) {
     if (array == NULL || size < 2) {
         return;
@@ -207,6 +231,7 @@ void insertionSort(int* array, unsigned long size) {
     }
 }
 
+/* Sorts array in-place using selection sort (O(n^2) for all cases; not sensitive to input order). */
 void selectionSort(int* array, unsigned long size) {
     if (array == NULL || size < 2) {
         return;
@@ -226,6 +251,8 @@ void selectionSort(int* array, unsigned long size) {
     }
 }
 
+/* Merges two adjacent sorted sub-arrays: array[left..mid] and array[mid+1..right].
+   Uses two temporary arrays L and R; result is written back into array[left..right]. */
 void merge(int* array, unsigned long left, unsigned long mid, unsigned long right) {
     unsigned long n1 = mid - left + 1;
     unsigned long n2 = right - mid;
@@ -266,6 +293,7 @@ void merge(int* array, unsigned long left, unsigned long mid, unsigned long righ
     free(R);
 }
 
+/* Recursive helper for mergeSort. Sorts array[left..right] in-place. */
 void mergeSortRecursive(int* array, long left, long right) {
     if (left < right) {
         long mid = left + (right - left) / 2;
@@ -275,6 +303,7 @@ void mergeSortRecursive(int* array, long left, long right) {
     }
 }
 
+/* Sorts array in-place using merge sort (O(n log n) for all cases; uses O(n) extra memory). */
 void mergeSort(int* array, unsigned long size) {
     if (array == NULL || size < 2) {
         return;
@@ -283,6 +312,7 @@ void mergeSort(int* array, unsigned long size) {
     mergeSortRecursive(array, 0, (long)size - 1);
 }
 
+/* Returns the maximum value in array. Used by radixSort to determine the number of digit passes needed. */
 int getMaxValue(int* array, unsigned long size) {
     int mx = array[0];
     for (unsigned long i = 1; i < size; i++) {
@@ -291,6 +321,8 @@ int getMaxValue(int* array, unsigned long size) {
     return mx;
 }
 
+/* Performs a stable counting sort on array by the digit at position exp (1, 10, 100, ...).
+   Called once per digit by radixSort. Uses a temporary output array of size `size`. */
 void countSortByDigit(int* array, unsigned long size, int exp) {
     if (size == 0) return;
 
@@ -321,6 +353,8 @@ void countSortByDigit(int* array, unsigned long size, int exp) {
     free(output);
 }
 
+/* Sorts array in-place using base-10 radix sort (O(d*(n+10)) where d = number of digits in the max value).
+   Processes digits from least significant to most significant. Only works for non-negative integers. */
 void radixSort(int* array, unsigned long size) {
     if (array == NULL || size < 2) return;
 
@@ -330,6 +364,8 @@ void radixSort(int* array, unsigned long size) {
     }
 }
 
+/* Runs the sorting algorithm identified by `type` on `data` and returns the elapsed time in milliseconds.
+   `type` must be one of the BUBBLE_SORT, QUICK_SORT, ... constants defined at the top of this file. */
 double measureSortAlg(int type, int* data, unsigned long size) {
     clock_t startTime = startOperationTimer();
     switch (type) {
@@ -360,10 +396,13 @@ double measureSortAlg(int type, int* data, unsigned long size) {
     return elapsedMs;
 }
 
+/* Prints the CSV column header to stdout. */
 void printHeader() {
     printf("Elements, Runs, Algorithm, Variant, Elapsed time(ms)\n");
 }
 
+/* Writes one result row to stdout and to resultsFile (if open).
+   Format: size, count, algorithmName, variant, elapsedMs (3 decimal places). */
 void writeResultRow(unsigned long size, int count, const char* algorithmName, const char* variant, double elapsedMs) {
     char line[256];
 
@@ -376,6 +415,9 @@ void writeResultRow(unsigned long size, int count, const char* algorithmName, co
 }
 
 
+/* Benchmarks algorithm `type` on arrays of length `size` across all input variants
+   (reversed, random, and partially sorted at 10/30/50/70/90%).
+   Each variant is run `count` times and the average elapsed time is written via writeResultRow. */
 void analyzeSortAlg(int type, unsigned long size, int count) {
     double elapsedMs, sumMs;
     const char* algorithmName = ALGORITHM_NAMES[type];
@@ -420,6 +462,7 @@ void analyzeSortAlg(int type, unsigned long size, int count) {
     printf("\n");
 }
 
+/* Runs analyzeSortAlg for all six algorithms at the given array size and run count. */
 void analyzeAlgo(unsigned long size, int count) {
     analyzeSortAlg(BUBBLE_SORT, size, count);
     analyzeSortAlg(QUICK_SORT, size, count);
