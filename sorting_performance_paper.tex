@@ -5,9 +5,12 @@
 \usepackage{longtable}
 \usepackage{array}
 \usepackage{float}
+\usepackage{amsmath}
 
 \title{Experimental Study of Sorting Algorithm Performance}
-\author{Maria Maiorescu}
+\author{Maria Maiorescu \\[4pt]
+\small{Year 1, Computer Science} \\
+\small{West University of Timișoara}}
 \date{\today}
 
 \begin{document}
@@ -15,11 +18,11 @@
 \maketitle
 
 \begin{abstract}
-This paper compares six sorting algorithms implemented in C: bubble sort, quick sort, insertion sort, selection sort, merge sort, and radix sort. The code in \texttt{algorithms.c} generates integer arrays with different patterns and measures average sorting time. The measured values are taken from \texttt{results.csv}. We compare what we expected from Big-O with what we actually measured.
+This paper compares six sorting algorithms implemented in C: bubble sort, quick sort, insertion sort, selection sort, merge sort, and radix sort. The code in \texttt{algorithms.c} generates integer arrays with different patterns and measures average sorting time. The measured values are taken from \texttt{results.csv}. We compare theoretical Big-O complexity predictions with empirically measured results.
 \end{abstract}
 
 \section{Introduction}
-Sorting is one of the most common tasks in computer science. Different sorting algorithms have different speeds and behave differently depending on the input \cite{cormen2009,sedgewick2011}. The goal of this study is to see how algorithm type and input pattern affect running time.
+Sorting is one of the most common tasks in computer science. Different sorting algorithms have different speeds and behave differently depending on the input \cite{cormen2009,sedgewick2011}. The goal of this study is to analyze how algorithm type and input pattern affect running time.
 
 The study analyzes:
 \begin{itemize}
@@ -254,7 +257,7 @@ This study shows that practical performance follows theoretical complexity in mo
     \item Quick sort can be very fast on random input but can become slow on ordered input with a simple pivot choice.
 \end{itemize}
 
-So, choosing a sorting algorithm should depend on both \textbf{input size} and \textbf{input pattern}. A better pivot rule for quick sort (for example random or median-based) would make its performance more stable.
+Choosing a sorting algorithm should therefore depend on both \textbf{input size} and \textbf{input pattern}. A better pivot strategy for quick sort (such as a random or median-of-three pivot) would make its performance more consistent across input types.
 
 \begin{thebibliography}{9}
 
