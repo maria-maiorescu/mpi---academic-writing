@@ -175,11 +175,20 @@ void swapInts(int* a, int* b) {
     *b = temp;
 }
 
-/* Partitions array[low..high] around the last element as pivot.
+/* Chooses the median of array[low], array[mid], array[high] as pivot,
+   swaps it into the array[high] position, then partitions array[low..high].
    Elements <= pivot are moved to the left; elements > pivot to the right.
-   Returns the final index of the pivot.
-   Note: using the last element as pivot causes O(n^2) behaviour on already sorted or reversed input. */
+   Returns the final index of the pivot. */
 long partitionQuickSort(int* array, long low, long high) {
+    long mid = low + (high - low) / 2;
+
+    /* Sort low, mid, high so that array[mid] is the median */
+    if (array[low] > array[mid])   swapInts(&array[low],  &array[mid]);
+    if (array[low] > array[high])  swapInts(&array[low],  &array[high]);
+    if (array[mid] > array[high])  swapInts(&array[mid],  &array[high]);
+    /* array[mid] is now the median; move it to high as pivot */
+    swapInts(&array[mid], &array[high]);
+
     int pivot = array[high];
     long i = low - 1;
 
@@ -465,10 +474,10 @@ void analyzeSortAlg(int type, unsigned long size, int count) {
 /* Runs analyzeSortAlg for all six algorithms at the given array size and run count. */
 void analyzeAlgo(unsigned long size, int count) {
     //analyzeSortAlg(BUBBLE_SORT, size, count);
-    analyzeSortAlg(QUICK_SORT, size, count);
+    //analyzeSortAlg(QUICK_SORT, size, count);
     //analyzeSortAlg(INSERTION_SORT, size, count);
     //analyzeSortAlg(SELECTION_SORT, size, count);
-    //analyzeSortAlg(MERGE_SORT, size, count);
+    analyzeSortAlg(MERGE_SORT, size, count);
     //analyzeSortAlg(RADIX_SORT, size, count);
 }
 
@@ -483,8 +492,8 @@ int main() {
     //analyzeAlgo(50, 1000000);
     //analyzeAlgo(100, 1000000);
     //analyzeAlgo(1000, 100);
-    //analyzeAlgo(10000, 10);
-    //analyzeAlgo(100000, 1);
+    analyzeAlgo(10000, 10);
+    analyzeAlgo(100000, 1);
     analyzeAlgo(1000000, 1);
 
     fclose(resultsFile);
