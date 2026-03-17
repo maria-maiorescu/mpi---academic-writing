@@ -66,7 +66,7 @@ The exact experiment configuration used in \texttt{main()} is:
     \item \(n=1000\), runs \(=100\)
     \item \(n=10000\), runs \(=10\)
     \item \(n=100{,}000\), runs \(=1\)
-    \item \(n=1{,}000{,}000\), runs \(=1\) (quick sort, merge sort, and radix sort all completed successfully; bubble sort measurements are from a previous run; insertion sort and selection sort were not run at this size)
+    \item \(n=1{,}000{,}000\), runs \(=1\) (quick sort, merge sort, radix sort, and selection sort all completed; bubble sort measurements are from a previous run; insertion sort was not run at this size)
 \end{itemize}
 
 The reported values are average elapsed time in milliseconds.
@@ -189,24 +189,43 @@ Insertion sort's sensitivity to input order is even more visible at \(n=100{,}00
 \begin{table}[H]
 \centering
 \footnotesize
-\begin{tabular}{lcccccc}
+\begin{tabular}{lccccccc}
 \toprule
-Variant & 10 & 50 & 100 & 1000 & 10000 & 100000 \\
+Variant & 10 & 50 & 100 & 1000 & 10000 & 100000 & 1{,}000{,}000 \\
 \midrule
-reversed & 0.001 & 0.006 & 0.023 & 2.093 & 206.273 & 7143.945 \\
-random & 0.001 & 0.009 & 0.031 & 2.388 & 230.297 & 6847.988 \\
-partially sorted 10\% & 0.001 & 0.007 & 0.026 & 2.347 & 233.828 & 6856.536 \\
-partially sorted 30\% & 0.001 & 0.007 & 0.026 & 2.345 & 239.237 & 6747.636 \\
-partially sorted 50\% & 0.001 & 0.007 & 0.026 & 2.345 & 235.613 & 6656.085 \\
-partially sorted 70\% & 0.001 & 0.007 & 0.025 & 2.346 & 235.761 & 6655.227 \\
-partially sorted 90\% & 0.001 & 0.007 & 0.026 & 2.363 & 234.586 & 6765.990 \\
+reversed & 0.001 & 0.006 & 0.023 & 2.093 & 206.273 & 7143.945 & 694{,}197.829 \\
+random & 0.001 & 0.009 & 0.031 & 2.388 & 230.297 & 6847.988 & 657{,}232.762 \\
+partially sorted 10\% & 0.001 & 0.007 & 0.026 & 2.347 & 233.828 & 6856.536 & 657{,}622.007 \\
+partially sorted 30\% & 0.001 & 0.007 & 0.026 & 2.345 & 239.237 & 6747.636 & 656{,}275.379 \\
+partially sorted 50\% & 0.001 & 0.007 & 0.026 & 2.345 & 235.613 & 6656.085 & 659{,}880.141 \\
+partially sorted 70\% & 0.001 & 0.007 & 0.025 & 2.346 & 235.761 & 6655.227 & 659{,}186.313 \\
+partially sorted 90\% & 0.001 & 0.007 & 0.026 & 2.363 & 234.586 & 6765.990 & 656{,}910.697 \\
 \bottomrule
 \end{tabular}
 \caption{Selection sort average elapsed time (ms) by input variant and size.}
 \label{tab:selection-results}
 \end{table}
 
-Selection sort has similar times for all input variants of the same size. This is expected because it always scans the remaining unsorted part to find the minimum. Its running time increases strongly with \(n\), as expected for \(O(n^2)\).
+\begin{table}[H]
+\centering
+\begin{tabular}{lcc}
+\toprule
+Variant & Time (ms) & Time (min) \\
+\midrule
+reversed & 694{,}197 & 11.6 \\
+random & 657{,}232 & 11.0 \\
+partially sorted 10\% & 657{,}622 & 11.0 \\
+partially sorted 30\% & 656{,}275 & 10.9 \\
+partially sorted 50\% & 659{,}880 & 11.0 \\
+partially sorted 70\% & 659{,}186 & 11.0 \\
+partially sorted 90\% & 656{,}910 & 10.9 \\
+\bottomrule
+\end{tabular}
+\caption{Selection sort at \(n=1{,}000{,}000\): average elapsed time (ms and min). Single run.}
+\label{tab:selection-1m}
+\end{table}
+
+Selection sort has similar times for all input variants of the same size, consistently confirming its input-insensitive \(O(n^2)\) behaviour. At \(n=1{,}000{,}000\) all variants fell between 10.9 and 11.6 minutes (Table~\ref{tab:selection-1m}), regardless of whether the data was reversed or partially sorted. This is expected: selection sort always scans the remaining unsorted portion to find the minimum, so the number of comparisons is the same no matter how the data is arranged.
 
 \subsection{Merge Sort}
 \begin{table}[H]
