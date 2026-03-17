@@ -464,12 +464,12 @@ void analyzeSortAlg(int type, unsigned long size, int count) {
 
 /* Runs analyzeSortAlg for all six algorithms at the given array size and run count. */
 void analyzeAlgo(unsigned long size, int count) {
-    analyzeSortAlg(BUBBLE_SORT, size, count);
+    //analyzeSortAlg(BUBBLE_SORT, size, count);
     analyzeSortAlg(QUICK_SORT, size, count);
-    analyzeSortAlg(INSERTION_SORT, size, count);
-    analyzeSortAlg(SELECTION_SORT, size, count);
-    analyzeSortAlg(MERGE_SORT, size, count);
-    analyzeSortAlg(RADIX_SORT, size, count);
+    //analyzeSortAlg(INSERTION_SORT, size, count);
+    //analyzeSortAlg(SELECTION_SORT, size, count);
+    //analyzeSortAlg(MERGE_SORT, size, count);
+    //analyzeSortAlg(RADIX_SORT, size, count);
 }
 
 int main() {
@@ -484,7 +484,7 @@ int main() {
     //analyzeAlgo(100, 1000000);
     //analyzeAlgo(1000, 100);
     //analyzeAlgo(10000, 10);
-    analyzeAlgo(100000, 1);
+    //analyzeAlgo(100000, 1);
     analyzeAlgo(1000000, 1);
 
     fclose(resultsFile);
