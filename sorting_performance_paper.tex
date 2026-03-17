@@ -5,7 +5,7 @@
 \usepackage{longtable}
 \usepackage{array}
 \usepackage{float}
-\usepackage{amsmath}
+\usepackage{hyperref}
 
 \title{Experimental Study of Sorting Algorithm Performance}
 \author{Maria Maiorescu \\[4pt]
@@ -66,7 +66,7 @@ The exact experiment configuration used in \texttt{main()} is:
     \item \(n=1000\), runs \(=100\)
     \item \(n=10000\), runs \(=10\)
     \item \(n=100{,}000\), runs \(=1\)
-    \item \(n=1{,}000{,}000\), runs \(=1\) (quick sort, merge sort, radix sort, and selection sort all completed; bubble sort measurements are from a previous run; insertion sort was not run at this size)
+    \item \(n=1{,}000{,}000\), runs \(=1\) (quick sort, merge sort, radix sort, selection sort, and insertion sort all completed; bubble sort measurements are from a previous run)
 \end{itemize}
 
 The reported values are average elapsed time in milliseconds.
@@ -166,24 +166,43 @@ With the median-of-three pivot, quick sort performs consistently across all inpu
 \begin{table}[H]
 \centering
 \footnotesize
-\begin{tabular}{lcccccc}
+\begin{tabular}{lccccccc}
 \toprule
-Variant & 10 & 50 & 100 & 1000 & 10000 & 100000 \\
+Variant & 10 & 50 & 100 & 1000 & 10000 & 100000 & 1{,}000{,}000 \\
 \midrule
-reversed & 0.001 & 0.007 & 0.025 & 2.385 & 235.495 & 8343.083 \\
-random & 0.001 & 0.005 & 0.015 & 1.209 & 118.386 & 4198.798 \\
-partially sorted 10\% & 0.001 & 0.002 & 0.005 & 0.292 & 27.537 & 985.757 \\
-partially sorted 30\% & 0.001 & 0.001 & 0.002 & 0.109 & 9.985 & 342.495 \\
-partially sorted 50\% & 0.001 & 0.001 & 0.002 & 0.069 & 6.381 & 222.384 \\
-partially sorted 70\% & 0.001 & 0.001 & 0.001 & 0.052 & 4.604 & 165.761 \\
-partially sorted 90\% & 0.001 & 0.001 & 0.001 & 0.042 & 3.688 & 122.072 \\
+reversed & 0.001 & 0.007 & 0.025 & 2.385 & 235.495 & 8343.083 & 812{,}518.108 \\
+random & 0.001 & 0.005 & 0.015 & 1.209 & 118.386 & 4198.798 & 396{,}591.700 \\
+partially sorted 10\% & 0.001 & 0.002 & 0.005 & 0.292 & 27.537 & 985.757 & 90{,}942.759 \\
+partially sorted 30\% & 0.001 & 0.001 & 0.002 & 0.109 & 9.985 & 342.495 & 33{,}490.967 \\
+partially sorted 50\% & 0.001 & 0.001 & 0.002 & 0.069 & 6.381 & 222.384 & 21{,}350.392 \\
+partially sorted 70\% & 0.001 & 0.001 & 0.001 & 0.052 & 4.604 & 165.761 & 15{,}011.237 \\
+partially sorted 90\% & 0.001 & 0.001 & 0.001 & 0.042 & 3.688 & 122.072 & 11{,}542.327 \\
 \bottomrule
 \end{tabular}
 \caption{Insertion sort average elapsed time (ms) by input variant and size.}
 \label{tab:insertion-results}
 \end{table}
 
-Insertion sort's sensitivity to input order is even more visible at \(n=100{,}000\): 4198.798 ms on random input compared to only 122.072 ms on 90\% partially sorted. This confirms the near-linear best case when few elements are out of place.
+\begin{table}[H]
+\centering
+\begin{tabular}{lcc}
+\toprule
+Variant & Time (ms) & Time (min) \\
+\midrule
+reversed & 812{,}518 & 13.5 \\
+random & 396{,}591 & 6.6 \\
+partially sorted 10\% & 90{,}942 & 1.5 \\
+partially sorted 30\% & 33{,}491 & 0.6 \\
+partially sorted 50\% & 21{,}350 & 0.4 \\
+partially sorted 70\% & 15{,}011 & 0.3 \\
+partially sorted 90\% & 11{,}542 & 0.2 \\
+\bottomrule
+\end{tabular}
+\caption{Insertion sort at \(n=1{,}000{,}000\): average elapsed time (ms and min). Single run.}
+\label{tab:insertion-1m}
+\end{table}
+
+Insertion sort's sensitivity to input order is extreme at \(n=1{,}000{,}000\) (Table~\ref{tab:insertion-1m}): reversed input took 13.5 minutes, random input 6.6 minutes, but 90\% partially sorted only 0.2 minutes (11.5 seconds). This gap of more than 70$\times$ between the worst and best case at the same size confirms the near-linear behaviour on nearly sorted data and the quadratic behaviour when many elements are out of place.
 
 \subsection{Selection Sort}
 \begin{table}[H]
@@ -290,7 +309,7 @@ The results confirm the expected classes of behavior:
 \end{itemize}
 
 \subsection{Quick Sort with Median-of-Three Pivot}
-The quick sort implementation uses a \emph{median-of-three} pivot strategy: before partitioning \texttt{array[low..high]}, the elements at positions \texttt{low}, \texttt{mid}, and \texttt{high} are compared and the median value is placed at \texttt{high} to be used as pivot. This prevents the degenerate case in which a sorted or reversed input always produces the worst-possible split.
+The quick sort implementation uses a \emph{median-of-three} pivot strategy: before partitioning \texttt{array[low..high]}, the elements at positions \texttt{low}, \texttt{mid}, and \texttt{high} are compared and the median value is placed at \texttt{high} to be used as pivot \cite{gfg_quicksort}. This prevents the degenerate case in which a sorted or reversed input always produces the worst-possible split.
 
 The results confirm this: at \(n=10{,}000\) all variants fall between 0.673 ms and 0.932 ms, and at \(n=100{,}000\) between 8.071 ms and 11.440 ms --- reversed and nearly-sorted inputs are no longer dramatically slower than random. At \(n=1{,}000{,}000\) the algorithm completed in 105--167 ms across all variants. By contrast, the original last-element pivot would have created one-million levels of recursion on reversed input, requiring approximately \(40\,\text{MB}\) of stack space and crashing the program (see Section~\ref{sec:notes}).
 
@@ -308,6 +327,39 @@ In an earlier version of \texttt{algorithms.c}, quick sort used the \emph{last e
 
 After switching to the median-of-three pivot, the recursion depth stays at \(O(\log_2 n) \approx 20\) levels even on sorted or reversed input, and quick sort now completes at \(n=1{,}000{,}000\) without a stack overflow. Bubble sort is iterative (no recursion) so it was never affected. Merge sort is also recursive, but always splits the array in half, keeping its recursion depth at \(O(\log_2 n) \approx 20\) levels, which is safe.
 
+\section{Summary at \(n=1{,}000{,}000\)}
+
+Table~\ref{tab:summary-1m} collects the measured elapsed time (in seconds) for all six algorithms and all input variants at \(n=1{,}000{,}000\). Algorithms are ordered from slowest to fastest on random input. Bubble sort values are from a previous run (last-element pivot); all other algorithms use the current implementation. ``ps'' abbreviates ``partially sorted''.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lrrrrrrr}
+\toprule
+Algorithm & reversed & random & ps 10\% & ps 30\% & ps 50\% & ps 70\% & ps 90\% \\
+\midrule
+Bubble sort    & 1318.5 & 1808.2 & 929.4 & 794.2 & 757.0 & 739.0 & 722.4 \\
+Insertion sort &  812.5 &  396.6 &  90.9 &  33.5 &  21.4 &  15.0 &  11.5 \\
+Selection sort &  694.2 &  657.2 & 657.6 & 656.3 & 659.9 & 659.2 & 656.9 \\
+Merge sort     &    0.216 &    0.283 &   0.235 &   0.222 &   0.219 &   0.220 &   0.222 \\
+Quick sort     &    0.115 &    0.133 &   0.106 &   0.106 &   0.114 &   0.135 &   0.167 \\
+Radix sort     &    0.064 &    0.072 &   0.062 &   0.062 &   0.062 &   0.062 &   0.062 \\
+\bottomrule
+\end{tabular}
+\caption{All algorithms at \(n=1{,}000{,}000\): elapsed time in seconds by input variant.}
+\label{tab:summary-1m}
+\end{table}
+
+Several conclusions stand out from this comparison:
+
+\begin{itemize}
+    \item \textbf{Radix sort is the fastest by a large margin}: 0.062--0.072 s across all variants. It is roughly twice as fast as merge sort and more than 10{,}000$\times$ faster than bubble sort on random input.
+    \item \textbf{Quick sort and merge sort are both fast and complete in well under one second}: quick sort in 0.105--0.167 s, merge sort in 0.215--0.283 s. Both are suitable for large inputs.
+    \item \textbf{The three \(O(n^2)\) algorithms are impractical at this scale}. Selection sort took about 11 minutes regardless of input variant. Insertion sort ranged from 11.5 seconds (90\% sorted) to 13.5 minutes (reversed), showing extreme sensitivity to order. Bubble sort was the slowest, exceeding 30 minutes on random input.
+    \item \textbf{Input order matters most for insertion sort}: the gap between the worst case (reversed, 812.5 s) and the best case (90\% sorted, 11.5 s) is more than 70$\times$ at the same size, while selection sort and bubble sort show much smaller relative variation.
+    \item \textbf{Input order has almost no effect on merge sort, radix sort, and quick sort} (with median-of-three pivot): all three stay within a factor of roughly 1.3$\times$ across all variants, confirming reliable performance independent of data order.
+\end{itemize}
+
 \section{Conclusion}
 This study shows that practical performance follows theoretical complexity in most cases:
 \begin{itemize}
@@ -319,6 +371,11 @@ This study shows that practical performance follows theoretical complexity in mo
 Choosing a sorting algorithm should therefore depend on both \textbf{input size} and \textbf{input pattern}. A better pivot strategy for quick sort (such as a random or median-of-three pivot) would make its performance more consistent across input types.
 
 \begin{thebibliography}{9}
+
+\bibitem{gfg_quicksort}
+GeeksforGeeks.
+\textit{Quick Sort Algorithm}.
+Available at: \url{https://www.geeksforgeeks.org/dsa/quick-sort-algorithm/}
 
 \bibitem{cormen2009}
 Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, and Clifford Stein.

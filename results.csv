@@ -497,3 +497,10 @@
 1000000, 1, selection sort, partially sorted 50%, 659880.141
 1000000, 1, selection sort, partially sorted 70%, 659186.313
 1000000, 1, selection sort, partially sorted 90%, 656910.697
+1000000, 1, insertion sort, reversed, 812518.108
+1000000, 1, insertion sort, random, 396591.700
+1000000, 1, insertion sort, partially sorted 10%, 90942.759
+1000000, 1, insertion sort, partially sorted 30%, 33490.967
+1000000, 1, insertion sort, partially sorted 50%, 21350.392
+1000000, 1, insertion sort, partially sorted 70%, 15011.237
+1000000, 1, insertion sort, partially sorted 90%, 11542.327

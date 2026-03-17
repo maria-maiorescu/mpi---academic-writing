@@ -331,30 +331,40 @@ int getMaxValue(int* array, unsigned long size) {
 }
 
 /* Performs a stable counting sort on array by the digit at position exp (1, 10, 100, ...).
-   Called once per digit by radixSort. Uses a temporary output array of size `size`. */
+   Called once per digit by radixSort. Uses a temporary output array of size `size`.
+   The algorithm works in four steps:
+     1. Count how many elements have each digit value (0-9) at position exp.
+     2. Convert counts to prefix sums so count[d] becomes the last output index for digit d.
+     3. Fill the output array from right to left (preserving stability: equal-digit elements
+        keep their original relative order).
+     4. Copy the output array back into the original array. */
 void countSortByDigit(int* array, unsigned long size, int exp) {
     if (size == 0) return;
 
     int* output = malloc(sizeof(int) * size);
     if (output == NULL) return;
 
+    /* Step 1: count occurrences of each digit (0-9) at position exp. */
     int count[10] = {0};
-
     for (unsigned long i = 0; i < size; i++) {
         int digit = (array[i] / exp) % 10;
         count[digit]++;
     }
 
+    /* Step 2: prefix-sum so that count[d] holds the number of elements
+       with digit <= d, i.e. the last valid output index + 1 for digit d. */
     for (int i = 1; i < 10; i++) {
         count[i] += count[i - 1];
     }
 
+    /* Step 3: place elements into output right-to-left to maintain stability. */
     for (long i = (long)size - 1; i >= 0; i--) {
         int digit = (array[i] / exp) % 10;
         output[count[digit] - 1] = array[i];
         count[digit]--;
     }
 
+    /* Step 4: copy sorted result back into the original array. */
     for (unsigned long i = 0; i < size; i++) {
         array[i] = output[i];
     }
@@ -362,12 +372,19 @@ void countSortByDigit(int* array, unsigned long size, int exp) {
     free(output);
 }
 
-/* Sorts array in-place using base-10 radix sort (O(d*(n+10)) where d = number of digits in the max value).
-   Processes digits from least significant to most significant. Only works for non-negative integers. */
+/* Sorts array in-place using base-10 LSD (least-significant digit) radix sort.
+   Time complexity: O(d * (n + 10)) where d is the number of digits in the maximum value.
+   Space complexity: O(n) for the temporary output buffer in each pass.
+   Only works correctly for non-negative integers.
+   Strategy: repeatedly call countSortByDigit for exp = 1, 10, 100, ...
+   until exp exceeds the maximum value (meaning all digit positions have been processed). */
 void radixSort(int* array, unsigned long size) {
     if (array == NULL || size < 2) return;
 
+    /* Find the largest element to know how many digit passes are needed. */
     int m = getMaxValue(array, size);
+
+    /* Run one counting-sort pass per digit position, from least to most significant. */
     for (int exp = 1; m / exp > 0; exp *= 10) {
         countSortByDigit(array, size, exp);
     }
@@ -473,12 +490,12 @@ void analyzeSortAlg(int type, unsigned long size, int count) {
 
 /* Runs analyzeSortAlg for all six algorithms at the given array size and run count. */
 void analyzeAlgo(unsigned long size, int count) {
-    //analyzeSortAlg(BUBBLE_SORT, size, count);
-    //analyzeSortAlg(QUICK_SORT, size, count);
-    //analyzeSortAlg(INSERTION_SORT, size, count);
+    analyzeSortAlg(BUBBLE_SORT, size, count);
+    analyzeSortAlg(QUICK_SORT, size, count);
+    analyzeSortAlg(INSERTION_SORT, size, count);
     analyzeSortAlg(SELECTION_SORT, size, count);
-    //analyzeSortAlg(MERGE_SORT, size, count);
-    //analyzeSortAlg(RADIX_SORT, size, count);
+    analyzeSortAlg(MERGE_SORT, size, count);
+    analyzeSortAlg(RADIX_SORT, size, count);
 }
 
 int main() {
@@ -488,13 +505,13 @@ int main() {
 
     printHeader();
 
-    //analyzeAlgo(10, 1000000);
-    //analyzeAlgo(50, 1000000);
-    //analyzeAlgo(100, 1000000);
-    //analyzeAlgo(1000, 100);
+    analyzeAlgo(10, 1000000);
+    analyzeAlgo(50, 1000000);
+    analyzeAlgo(100, 1000000);
+    analyzeAlgo(1000, 100);
     //analyzeAlgo(10000, 10);
     //analyzeAlgo(100000, 1);
-    analyzeAlgo(1000000, 1);
+    //analyzeAlgo(1000000, 1);
 
     fclose(resultsFile);
 
