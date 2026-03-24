@@ -399,3 +399,24 @@
 10, 1000000, quick sort, partially sorted 50%, 0.001
 10, 1000000, quick sort, partially sorted 70%, 0.001
 10, 1000000, quick sort, partially sorted 90%, 0.001
+10, 1000000, quick sort, reversed, 0.001
+10, 1000000, quick sort, random, 0.001
+10, 1000000, quick sort, partially sorted 10%, 0.001
+10, 1000000, quick sort, partially sorted 30%, 0.001
+10, 1000000, quick sort, partially sorted 50%, 0.001
+10, 1000000, quick sort, partially sorted 70%, 0.001
+10, 1000000, quick sort, partially sorted 90%, 0.001
+10, 1000000, quick sort, reversed, 0.001
+10, 1000000, quick sort, random, 0.001
+10, 1000000, quick sort, partially sorted 10%, 0.001
+10, 1000000, quick sort, partially sorted 30%, 0.001
+10, 1000000, quick sort, partially sorted 50%, 0.001
+10, 1000000, quick sort, partially sorted 70%, 0.001
+10, 1000000, quick sort, partially sorted 90%, 0.001
+50, 1000000, quick sort, reversed, 0.011
+50, 1000000, quick sort, random, 0.005
+50, 1000000, quick sort, partially sorted 10%, 0.007
+50, 1000000, quick sort, partially sorted 30%, 0.011
+50, 1000000, quick sort, partially sorted 50%, 0.011
+50, 1000000, quick sort, partially sorted 70%, 0.011
+50, 1000000, quick sort, partially sorted 90%, 0.011
