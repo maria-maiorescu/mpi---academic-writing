@@ -399,24 +399,108 @@
 10, 1000000, quick sort, partially sorted 50%, 0.001
 10, 1000000, quick sort, partially sorted 70%, 0.001
 10, 1000000, quick sort, partially sorted 90%, 0.001
-10, 1000000, quick sort, reversed, 0.001
-10, 1000000, quick sort, random, 0.001
-10, 1000000, quick sort, partially sorted 10%, 0.001
-10, 1000000, quick sort, partially sorted 30%, 0.001
-10, 1000000, quick sort, partially sorted 50%, 0.001
-10, 1000000, quick sort, partially sorted 70%, 0.001
-10, 1000000, quick sort, partially sorted 90%, 0.001
-10, 1000000, quick sort, reversed, 0.001
-10, 1000000, quick sort, random, 0.001
-10, 1000000, quick sort, partially sorted 10%, 0.001
-10, 1000000, quick sort, partially sorted 30%, 0.001
-10, 1000000, quick sort, partially sorted 50%, 0.001
-10, 1000000, quick sort, partially sorted 70%, 0.001
-10, 1000000, quick sort, partially sorted 90%, 0.001
-50, 1000000, quick sort, reversed, 0.011
-50, 1000000, quick sort, random, 0.005
-50, 1000000, quick sort, partially sorted 10%, 0.007
-50, 1000000, quick sort, partially sorted 30%, 0.011
-50, 1000000, quick sort, partially sorted 50%, 0.011
-50, 1000000, quick sort, partially sorted 70%, 0.011
-50, 1000000, quick sort, partially sorted 90%, 0.011
+1000000, 1, quick sort, reversed, 116.280
+1000000, 1, quick sort, random, 132.851
+1000000, 1, quick sort, partially sorted 10%, 97.493
+1000000, 1, quick sort, partially sorted 30%, 105.755
+1000000, 1, quick sort, partially sorted 50%, 122.545
+1000000, 1, quick sort, partially sorted 70%, 155.976
+1000000, 1, quick sort, partially sorted 90%, 139.622
+1000000, 1, radix sort, reversed, 64.207
+1000000, 1, radix sort, random, 73.582
+1000000, 1, radix sort, partially sorted 10%, 62.214
+1000000, 1, radix sort, partially sorted 30%, 62.676
+1000000, 1, radix sort, partially sorted 50%, 62.663
+1000000, 1, radix sort, partially sorted 70%, 62.158
+1000000, 1, radix sort, partially sorted 90%, 61.929
+10000, 10, quick sort, reversed, 0.724
+10000, 10, quick sort, random, 0.932
+10000, 10, quick sort, partially sorted 10%, 0.683
+10000, 10, quick sort, partially sorted 30%, 0.673
+10000, 10, quick sort, partially sorted 50%, 0.731
+10000, 10, quick sort, partially sorted 70%, 0.759
+10000, 10, quick sort, partially sorted 90%, 0.868
+100000, 1, quick sort, reversed, 9.267
+100000, 1, quick sort, random, 11.435
+100000, 1, quick sort, partially sorted 10%, 8.231
+100000, 1, quick sort, partially sorted 30%, 8.071
+100000, 1, quick sort, partially sorted 50%, 9.250
+100000, 1, quick sort, partially sorted 70%, 11.440
+100000, 1, quick sort, partially sorted 90%, 10.469
+1000000, 1, quick sort, reversed, 115.232
+1000000, 1, quick sort, random, 132.912
+1000000, 1, quick sort, partially sorted 10%, 105.573
+1000000, 1, quick sort, partially sorted 30%, 105.605
+1000000, 1, quick sort, partially sorted 50%, 114.133
+1000000, 1, quick sort, partially sorted 70%, 134.825
+1000000, 1, quick sort, partially sorted 90%, 167.001
+10000, 10, radix sort, reversed, 0.415
+10000, 10, radix sort, random, 0.500
+10000, 10, radix sort, partially sorted 10%, 0.415
+10000, 10, radix sort, partially sorted 30%, 0.414
+10000, 10, radix sort, partially sorted 50%, 0.414
+10000, 10, radix sort, partially sorted 70%, 0.414
+10000, 10, radix sort, partially sorted 90%, 0.417
+100000, 1, radix sort, reversed, 5.254
+100000, 1, radix sort, random, 6.286
+100000, 1, radix sort, partially sorted 10%, 5.122
+100000, 1, radix sort, partially sorted 30%, 5.092
+100000, 1, radix sort, partially sorted 50%, 5.103
+100000, 1, radix sort, partially sorted 70%, 5.219
+100000, 1, radix sort, partially sorted 90%, 5.093
+1000000, 1, radix sort, reversed, 63.885
+1000000, 1, radix sort, random, 72.339
+1000000, 1, radix sort, partially sorted 10%, 62.021
+1000000, 1, radix sort, partially sorted 30%, 61.734
+1000000, 1, radix sort, partially sorted 50%, 61.880
+1000000, 1, radix sort, partially sorted 70%, 62.257
+1000000, 1, radix sort, partially sorted 90%, 61.804
+10000, 10, merge sort, reversed, 1.953
+10000, 10, merge sort, random, 2.450
+10000, 10, merge sort, partially sorted 10%, 2.130
+10000, 10, merge sort, partially sorted 30%, 2.030
+10000, 10, merge sort, partially sorted 50%, 1.985
+10000, 10, merge sort, partially sorted 70%, 1.987
+10000, 10, merge sort, partially sorted 90%, 1.977
+100000, 1, merge sort, reversed, 20.760
+100000, 1, merge sort, random, 26.687
+100000, 1, merge sort, partially sorted 10%, 22.352
+100000, 1, merge sort, partially sorted 30%, 21.263
+100000, 1, merge sort, partially sorted 50%, 21.659
+100000, 1, merge sort, partially sorted 70%, 20.840
+100000, 1, merge sort, partially sorted 90%, 21.057
+1000000, 1, merge sort, reversed, 215.607
+1000000, 1, merge sort, random, 283.100
+1000000, 1, merge sort, partially sorted 10%, 235.289
+1000000, 1, merge sort, partially sorted 30%, 221.569
+1000000, 1, merge sort, partially sorted 50%, 219.031
+1000000, 1, merge sort, partially sorted 70%, 219.973
+1000000, 1, merge sort, partially sorted 90%, 222.079
+10000, 10, selection sort, reversed, 70.290
+10000, 10, selection sort, random, 67.583
+10000, 10, selection sort, partially sorted 10%, 66.306
+10000, 10, selection sort, partially sorted 30%, 67.238
+10000, 10, selection sort, partially sorted 50%, 66.921
+10000, 10, selection sort, partially sorted 70%, 66.659
+10000, 10, selection sort, partially sorted 90%, 67.462
+100000, 1, selection sort, reversed, 7031.485
+100000, 1, selection sort, random, 6575.641
+100000, 1, selection sort, partially sorted 10%, 6543.933
+100000, 1, selection sort, partially sorted 30%, 6552.208
+100000, 1, selection sort, partially sorted 50%, 6541.301
+100000, 1, selection sort, partially sorted 70%, 6561.228
+100000, 1, selection sort, partially sorted 90%, 6544.236
+1000000, 1, selection sort, reversed, 694197.829
+1000000, 1, selection sort, random, 657232.762
+1000000, 1, selection sort, partially sorted 10%, 657622.007
+1000000, 1, selection sort, partially sorted 30%, 656275.379
+1000000, 1, selection sort, partially sorted 50%, 659880.141
+1000000, 1, selection sort, partially sorted 70%, 659186.313
+1000000, 1, selection sort, partially sorted 90%, 656910.697
+1000000, 1, insertion sort, reversed, 812518.108
+1000000, 1, insertion sort, random, 396591.700
+1000000, 1, insertion sort, partially sorted 10%, 90942.759
+1000000, 1, insertion sort, partially sorted 30%, 33490.967
+1000000, 1, insertion sort, partially sorted 50%, 21350.392
+1000000, 1, insertion sort, partially sorted 70%, 15011.237
+1000000, 1, insertion sort, partially sorted 90%, 11542.327
