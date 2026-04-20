@@ -2,3 +2,4 @@ algorithms
 tempCodeRunnerFile.c
 *.zip
 .DS_Store
+other/**
