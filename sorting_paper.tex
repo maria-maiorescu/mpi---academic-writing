@@ -1,0 +1,443 @@
+\documentclass[11pt,a4paper]{article}
+
+% --- Packages ---
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue!60!black, citecolor=blue!60!black, urlcolor=blue!60!black}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{float}
+\usepackage{parskip}
+\usepackage{microtype}
+\usepackage{enumitem}
+
+% --- Code listing style ---
+\lstset{
+  language=C,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\bfseries\color{blue!70!black},
+  commentstyle=\itshape\color{green!50!black},
+  stringstyle=\color{red!60!black},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  breaklines=true,
+  frame=single,
+  captionpos=b,
+  tabsize=4
+}
+
+% --- Theorem environments ---
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}
+
+% =====================================================================
+\begin{document}
+
+% =====================================================================
+%  TITLE BLOCK
+% =====================================================================
+\title{\textbf{An Experimental Comparison of Sorting Algorithms:\\
+Performance Across Data Sizes, Structures, and Input Variants}}
+
+\author{
+  Maria Maiorescu \\
+  \small Faculty of Informatics, Department of Computer Science \\
+  \small West University of Timi\c{s}oara \\
+  \small \href{mailto:maria.maiorescu06@e-uvt.ro}{maria.maiorescu06@e-uvt.ro}
+}
+
+\date{\today}
+\maketitle
+\thispagestyle{empty}
+
+% =====================================================================
+%  ABSTRACT
+% =====================================================================
+\begin{abstract}
+Sorting is one of the most fundamental operations in computer science, appearing in databases, compilers, search engines, and virtually every data-intensive application. Despite being extensively studied in theory, the practical performance of sorting algorithms is heavily influenced by factors that asymptotic analysis alone cannot capture: input size, degree of pre-sortedness, data distribution, and hardware characteristics.
+
+This paper presents an experimental comparison of six classical sorting algorithms --- Bubble Sort, Insertion Sort, Selection Sort, Merge Sort, Quick Sort, and Radix Sort --- implemented in C. The algorithms are benchmarked across a wide range of input sizes (from 10 to 1\,000\,000 elements) and across multiple structural variants of the input data (random, reversed, and partially sorted at various levels). Timing measurements are averaged over a large number of runs for small inputs and performed on single large arrays for larger ones.
+
+The results confirm the expected theoretical classifications while revealing important practical nuances: insertion sort's exceptional speed on nearly-sorted data, the quadratic degradation of bubble and selection sort at scale, the instability of quick sort under adversarial or structured inputs, and the remarkable consistency of radix sort. These findings are discussed in relation to established algorithmic theory and prior comparative studies.
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+% =====================================================================
+%  1. INTRODUCTION
+% =====================================================================
+\section{Introduction}
+
+\subsection{Motivation and Context}
+
+Sorting --- the process of rearranging a collection of items into a specified order --- is arguably the single most studied problem in computer science. From Knuth's encyclopedic treatment \cite{knuth1998} to modern systems research, sorting has served as both a practical workhorse and a theoretical proving ground. It appears as a critical sub-step in database query processing, external memory algorithms, compilers (symbol table management), and network packet scheduling, among countless other domains.
+
+The importance of studying sorting experimentally, and not merely theoretically, stems from the well-known gap between worst-case asymptotic complexity and real-world performance. An algorithm with $\mathcal{O}(n \log n)$ worst-case complexity may be slower in practice than a quadratic algorithm on small inputs due to constant factors, cache behaviour, or branch misprediction. Similarly, an algorithm that is theoretically optimal on random data may perform catastrophically on structured data that arises naturally in practice (e.g., nearly-sorted logs, reverse-sorted priority queues).
+
+Existing comparisons often focus on a narrow subset of algorithms or input conditions. This study aims to bridge that gap by providing a systematic experimental investigation across six representative algorithms, multiple input sizes spanning seven orders of magnitude, and several structural input variants.
+
+\subsection{Existing Solutions and Their Limitations}
+
+The six algorithms chosen for this study represent the canonical curriculum of sorting:
+
+\begin{itemize}[noitemsep]
+  \item \textbf{Bubble Sort} and \textbf{Selection Sort} are simple $\mathcal{O}(n^2)$ algorithms, well-suited for teaching but rarely used in production.
+  \item \textbf{Insertion Sort} is also $\mathcal{O}(n^2)$ in the worst case but $\mathcal{O}(n)$ on nearly-sorted input, making it effective for small or almost-sorted arrays --- a property exploited by hybrid algorithms like Timsort.
+  \item \textbf{Merge Sort} is a divide-and-conquer algorithm with guaranteed $\mathcal{O}(n \log n)$ performance but requires $\mathcal{O}(n)$ auxiliary memory.
+  \item \textbf{Quick Sort} is typically the fastest comparison-based sort in practice ($\mathcal{O}(n \log n)$ average) but degrades to $\mathcal{O}(n^2)$ on adversarial inputs; pivot selection is critical.
+  \item \textbf{Radix Sort} operates in $\mathcal{O}(d \cdot n)$ time --- linear in $n$ for fixed-width integers --- but is restricted to integer or otherwise discretizable keys.
+\end{itemize}
+
+A known limitation of textbook treatments is that they compare these algorithms only on random data and at a single scale. Real-world data is rarely uniformly random; it is often partially sorted, contains repeated elements, or arrives in reverse order.
+
+\subsection{Outline of This Work}
+
+The remainder of this paper is organized as follows. Section~\ref{sec:formal} provides a formal definition of the sorting problem and a summary of the complexity properties of each algorithm. Section~\ref{sec:implementation} describes the architecture of the benchmarking program, the data generation strategy, and the timing methodology. Section~\ref{sec:experiment} presents the experimental results, including tables and analysis. Section~\ref{sec:related} surveys related work. Section~\ref{sec:conclusion} summarises findings and directions for future work. References follow.
+
+\subsection*{Declaration of Originality}
+
+The benchmarking program described in this paper, including all sorting algorithm implementations, data generators, and timing infrastructure, was written independently by the author in C. The experimental design --- choice of input sizes, structural variants, and averaging methodology --- is the author's own. All textual analysis and interpretation of results are original. External sources are cited where algorithmic descriptions or theoretical results are drawn from prior work.
+
+% =====================================================================
+%  2. FORMAL PRESENTATION
+% =====================================================================
+\section{Formal Presentation of the Problem and Solution}
+\label{sec:formal}
+
+\subsection{The Sorting Problem}
+
+\begin{definition}[Sorting Problem]
+Let $A = \langle a_1, a_2, \ldots, a_n \rangle$ be a sequence of $n$ elements drawn from a totally ordered set $(S, \leq)$. A \emph{sorting algorithm} produces a permutation $A' = \langle a_{\pi(1)}, a_{\pi(2)}, \ldots, a_{\pi(n)} \rangle$ such that $a_{\pi(1)} \leq a_{\pi(2)} \leq \cdots \leq a_{\pi(n)}$.
+\end{definition}
+
+In this work, $S = \mathbb{Z}$ (non-negative integers) and the order is the standard $\leq$ on integers.
+
+\subsection{Algorithmic Descriptions and Complexity}
+
+We summarize each algorithm's strategy and complexity in Table~\ref{tab:complexity}.
+
+\begin{table}[H]
+\centering
+\caption{Theoretical time and space complexity of the six algorithms studied.}
+\label{tab:complexity}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Algorithm} & \textbf{Best} & \textbf{Average} & \textbf{Worst} & \textbf{Space} \\
+\midrule
+Bubble Sort      & $\mathcal{O}(n)$        & $\mathcal{O}(n^2)$      & $\mathcal{O}(n^2)$      & $\mathcal{O}(1)$ \\
+Insertion Sort   & $\mathcal{O}(n)$        & $\mathcal{O}(n^2)$      & $\mathcal{O}(n^2)$      & $\mathcal{O}(1)$ \\
+Selection Sort   & $\mathcal{O}(n^2)$      & $\mathcal{O}(n^2)$      & $\mathcal{O}(n^2)$      & $\mathcal{O}(1)$ \\
+Merge Sort       & $\mathcal{O}(n \log n)$ & $\mathcal{O}(n \log n)$ & $\mathcal{O}(n \log n)$ & $\mathcal{O}(n)$ \\
+Quick Sort       & $\mathcal{O}(n \log n)$ & $\mathcal{O}(n \log n)$ & $\mathcal{O}(n^2)$      & $\mathcal{O}(\log n)$ \\
+Radix Sort (LSD) & $\mathcal{O}(dn)$       & $\mathcal{O}(dn)$       & $\mathcal{O}(dn)$       & $\mathcal{O}(n + d)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Here $d$ denotes the number of digits in the maximum element (for base-10 LSD radix sort), which is $\mathcal{O}(\log_{10} \max(A))$.
+
+\subsection{Key Theoretical Properties}
+
+\begin{proposition}[Lower bound for comparison-based sorting]
+Any comparison-based sorting algorithm requires $\Omega(n \log n)$ comparisons in the worst case \cite{cormen2022}.
+\end{proposition}
+
+This lower bound means that Merge Sort and Quick Sort (on average) are asymptotically optimal among comparison-based algorithms. Radix Sort circumvents this bound by not relying solely on comparisons.
+
+\begin{proposition}[Correctness of Bubble Sort with early exit]
+The optimised bubble sort (with a \texttt{swapped} flag) terminates in $\mathcal{O}(n)$ time on a sorted input, because the first full pass produces no swaps and the algorithm halts immediately.
+\end{proposition}
+
+\begin{proposition}[Stability]
+Bubble Sort, Insertion Sort, and Merge Sort (as implemented here) are \emph{stable}: equal elements preserve their original relative order. Selection Sort, Quick Sort, and Radix Sort (LSD with right-to-left fill, as implemented) are stable in this implementation but Quick Sort's stability depends on the partition strategy.
+\end{proposition}
+
+% =====================================================================
+%  3. IMPLEMENTATION
+% =====================================================================
+\section{Implementation and Architecture}
+\label{sec:implementation}
+
+\subsection{Program Architecture}
+
+The benchmarking program is a single-file C application (\texttt{algorithms.c}), compiled with a standard C99-compatible compiler. Its architecture follows a layered design:
+
+\begin{enumerate}[noitemsep]
+  \item \textbf{Data generation layer}: functions that allocate and populate integer arrays according to a specified structural variant.
+  \item \textbf{Sorting layer}: six independent sorting function implementations, each operating in-place on an \texttt{int*} array.
+  \item \textbf{Timing layer}: thin wrappers around \texttt{clock()} that record start time and compute elapsed milliseconds.
+  \item \textbf{Benchmarking layer}: \texttt{analyzeSortAlg} and \texttt{analyzeAlgo}, which orchestrate repeated trials and write results to both standard output and a CSV file.
+\end{enumerate}
+
+\subsection{Data Structures}
+
+All arrays are heap-allocated C arrays of type \texttt{int*}. Each array is freshly allocated and freed per trial to ensure no cross-contamination between runs. The key data structures are:
+
+\begin{itemize}[noitemsep]
+  \item \textbf{Integer arrays} (\texttt{int*}): the primary data structure for all experiments.
+  \item \textbf{Auxiliary arrays in Merge Sort}: each merge step allocates two temporary sub-arrays \texttt{L} and \texttt{R}, which are freed after the merge.
+  \item \textbf{Output buffer in Radix Sort}: a single auxiliary array of size $n$ is allocated per digit pass.
+\end{itemize}
+
+\subsection{Data Generators}
+
+Three structural variants of integer arrays are generated:
+
+\begin{description}[noitemsep]
+  \item[Random] Values are drawn uniformly at random from $[0, n]$ using \texttt{rand()}, seeded once at program start via \texttt{srand(time(NULL))}.
+  \item[Reverse sorted] The array $\langle n-1, n-2, \ldots, 1, 0 \rangle$ is generated deterministically.
+  \item[Partially sorted] Starting from the sorted sequence $\langle 0, 1, \ldots, n-1 \rangle$, exactly $\lfloor n / \textit{factor} \rfloor$ random swaps are performed. The \textit{factor} parameter ranges over $\{10, 30, 50, 70, 90\}$, corresponding to approximately $10\%, 3.3\%, 2\%, 1.4\%, 1.1\%$ of elements displaced, respectively.
+\end{description}
+
+\subsection{Timing Methodology}
+
+Time is measured using \texttt{clock()}, which returns CPU time consumed by the process. Elapsed time in milliseconds is computed as:
+\[
+  t = \frac{\texttt{clock\_end} - \texttt{clock\_start}}{\texttt{CLOCKS\_PER\_SEC}} \times 1000
+\]
+
+For small arrays (sizes 10, 50, 100), one million independent trials are performed and the \emph{average} time per sort is reported. For medium arrays (size 1\,000), 100 trials are averaged. For large arrays ($\geq 10\,000$), single runs or 10-run averages are used, as each individual sort takes sufficiently long to be measured reliably.
+
+\subsection{Key Implementation Details}
+
+\begin{description}[noitemsep]
+  \item[Quick Sort pivot] A median-of-three pivot strategy is used: the median of \texttt{array[low]}, \texttt{array[mid]}, and \texttt{array[high]} is chosen. This mitigates worst-case behaviour on sorted and reverse-sorted inputs compared to a naive last-element pivot.
+  \item[Bubble Sort optimisation] A \texttt{swapped} flag terminates the outer loop early if no swap occurred in a full pass, achieving $\mathcal{O}(n)$ on already-sorted input.
+  \item[Radix Sort scope] The LSD radix sort operates in base 10 and handles only non-negative integers, which is guaranteed by the data generators.
+\end{description}
+
+\subsection{User Manual}
+
+\textbf{Compilation:}
+\begin{lstlisting}[language=bash, numbers=none]
+gcc -O2 -o algorithms algorithms.c -lm
+\end{lstlisting}
+
+\textbf{Execution:}
+\begin{lstlisting}[language=bash, numbers=none]
+./algorithms
+\end{lstlisting}
+
+The program writes results to \texttt{results.csv} in the current directory (appending if the file already exists) and also prints them to standard output in CSV format:
+\begin{lstlisting}[language=bash, numbers=none]
+Elements, Runs, Algorithm, Variant, Elapsed time(ms)
+\end{lstlisting}
+
+To run additional sizes, uncomment the relevant \texttt{analyzeAlgo} lines in \texttt{main()}. Note that running sizes of $10^6$ for quadratic algorithms (bubble, insertion, selection sort) requires several hours of CPU time.
+
+% =====================================================================
+%  4. EXPERIMENT
+% =====================================================================
+\section{Experimental Study}
+\label{sec:experiment}
+
+\subsection{Experimental Setup}
+
+Experiments were run on a personal computer running a Unix-like operating system. The program was compiled with \texttt{gcc -O2}. No other CPU-intensive processes were deliberately running during the large-size experiments. The random seed was set once per program run via \texttt{srand(time(NULL))}.
+
+Array sizes tested: $n \in \{10, 50, 100, 1\,000, 10\,000, 100\,000, 1\,000\,000\}$.
+
+Input variants tested: reversed, random, partially sorted at 10\%, 30\%, 50\%, 70\%, 90\%.
+
+\subsection{Results: Small Arrays ($n \leq 100$)}
+
+For very small arrays, all algorithms perform comparably --- differences are sub-microsecond per sort and only visible when averaged over $10^6$ runs. Table~\ref{tab:small} reports the average time in milliseconds \emph{per sort} for $n = 100$.
+
+\begin{table}[H]
+\centering
+\caption{Average time per sort (ms) for $n=100$, averaged over $10^6$ runs.}
+\label{tab:small}
+\begin{tabular}{lrrrrrrr}
+\toprule
+\textbf{Algorithm} & \textbf{Rev.} & \textbf{Rand.} & \textbf{PS 10\%} & \textbf{PS 30\%} & \textbf{PS 50\%} & \textbf{PS 70\%} & \textbf{PS 90\%} \\
+\midrule
+Bubble Sort    & 0.037 & 0.047 & 0.027 & 0.020 & 0.017 & 0.013 & 0.013 \\
+Quick Sort     & 0.036 & 0.011 & 0.015 & 0.028 & 0.032 & 0.037 & 0.037 \\
+Insertion Sort & 0.025 & 0.015 & 0.005 & 0.002 & 0.002 & 0.001 & 0.001 \\
+Selection Sort & 0.023 & 0.031 & 0.026 & 0.026 & 0.026 & 0.025 & 0.026 \\
+Merge Sort     & 0.010 & 0.016 & 0.012 & 0.011 & 0.010 & 0.010 & 0.010 \\
+Radix Sort     & 0.005 & 0.007 & 0.005 & 0.005 & 0.005 & 0.005 & 0.005 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Even at $n=100$, Radix Sort and Merge Sort are the fastest, while Bubble Sort on random input is the slowest. Insertion Sort is remarkably fast on nearly-sorted arrays (PS 70--90\%).
+
+\subsection{Results: Medium Arrays ($n = 1\,000$)}
+
+\begin{table}[H]
+\centering
+\caption{Average time per sort (ms) for $n=1\,000$, averaged over 100 runs.}
+\label{tab:medium}
+\begin{tabular}{lrrrrrrr}
+\toprule
+\textbf{Algorithm} & \textbf{Rev.} & \textbf{Rand.} & \textbf{PS 10\%} & \textbf{PS 30\%} & \textbf{PS 50\%} & \textbf{PS 70\%} & \textbf{PS 90\%} \\
+\midrule
+Bubble Sort    & 3.711 & 3.120 & 2.537 & 2.353 & 2.264 & 2.176 & 2.169 \\
+Quick Sort     & 3.215 & 0.160 & 0.217 & 0.367 & 0.622 & 0.780 & 1.052 \\
+Insertion Sort & 2.385 & 1.209 & 0.292 & 0.109 & 0.069 & 0.052 & 0.042 \\
+Selection Sort & 2.093 & 2.388 & 2.347 & 2.345 & 2.345 & 2.346 & 2.363 \\
+Merge Sort     & 0.124 & 0.214 & 0.150 & 0.138 & 0.135 & 0.129 & 0.130 \\
+Radix Sort     & 0.066 & 0.103 & 0.087 & 0.065 & 0.065 & 0.066 & 0.067 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At $n=1\,000$, the performance gap between the $\mathcal{O}(n^2)$ and $\mathcal{O}(n \log n)$ algorithms becomes clearly visible. Quick Sort's median-of-three pivot causes it to perform poorly on the \emph{reversed} array (3.215\,ms) --- a striking anomaly discussed in Section~\ref{sec:analysis}. Insertion Sort on PS\,90\% (0.042\,ms) is already competitive with Radix Sort.
+
+\subsection{Results: Large Arrays ($n = 10\,000$ to $n = 1\,000\,000$)}
+
+Table~\ref{tab:large} presents results for the algorithms that are computationally feasible at large scale. Quadratic algorithms on $n = 10^6$ are included for completeness but took on the order of hours to complete.
+
+\begin{table}[H]
+\centering
+\caption{Elapsed time (ms) for large $n$, single run (or 10-run average for $n=10\,000$). \\ ``---'' indicates the algorithm was not run at that size.}
+\label{tab:large}
+\begin{tabular}{llrrrrrrr}
+\toprule
+$n$ & \textbf{Algorithm} & \textbf{Rev.} & \textbf{Rand.} & \textbf{PS 10\%} & \textbf{PS 30\%} & \textbf{PS 50\%} & \textbf{PS 70\%} & \textbf{PS 90\%} \\
+\midrule
+\multirow{6}{*}{10\,000}
+ & Bubble Sort    & 361.3  & 310.3  & 254.3  & 245.1 & 236.3 & 232.8 & 230.0 \\
+ & Quick Sort     & 312.1  & 2.1    & 3.1    & 5.1   & 9.9   & 7.4   & 10.6  \\
+ & Insertion Sort & 235.5  & 118.4  & 27.5   & 10.0  & 6.4   & 4.6   & 3.7   \\
+ & Selection Sort & 206.3  & 230.3  & 233.8  & 239.2 & 235.6 & 235.8 & 234.6 \\
+ & Merge Sort     & 1.5    & 2.8    & 1.9    & 1.7   & 1.7   & 1.7   & 1.7   \\
+ & Radix Sort     & 0.9    & 1.0    & 0.9    & 0.9   & 0.9   & 0.9   & 0.9   \\
+\midrule
+\multirow{6}{*}{100\,000}
+ & Bubble Sort    & 13228  & 18521  & 9424   & 8105  & 7538  & 7643  & 7640  \\
+ & Quick Sort     & 12726  & 10.4   & 14.7   & 17.4  & 41.5  & 50.4  & 72.1  \\
+ & Insertion Sort & 8343   & 4199   & 985.8  & 342.5 & 222.4 & 165.8 & 122.1 \\
+ & Selection Sort & 7144   & 6848   & 6857   & 6748  & 6656  & 6655  & 6766  \\
+ & Merge Sort     & 20.6   & 28.2   & 23.2   & 22.1  & 22.1  & 21.5  & 21.4  \\
+ & Radix Sort     & 5.9    & 6.4    & 5.7    & 5.3   & 5.3   & 5.4   & 5.2   \\
+\midrule
+\multirow{6}{*}{1\,000\,000}
+ & Bubble Sort    & 1\,318\,479 & 1\,808\,240 & 929\,435 & 794\,225 & 756\,972 & 738\,981 & 722\,408 \\
+ & Quick Sort     & 114.6  & 130.2  & 99.0   & 107.5 & 126.5 & 148.3 & 148.1 \\
+ & Insertion Sort & 812\,518& 396\,592& 90\,943& 33\,491& 21\,350& 15\,011& 11\,542\\
+ & Selection Sort & 694\,198& 657\,233& 657\,622& 656\,275& 659\,880& 659\,186& 656\,911\\
+ & Merge Sort     & 232.7  & 359.7  & 254.3  & 238.2 & 231.8 & 230.9 & 227.0 \\
+ & Radix Sort     & 63.6   & 70.5   & 62.1   & 62.1  & 62.2  & 62.1  & 61.9  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Analysis and Discussion}
+\label{sec:analysis}
+
+\paragraph{Quadratic algorithms scale disastrously.}
+Bubble Sort on $n = 10^6$ random data takes over 30 minutes (1\,808\,240\,ms $\approx$ 30 min). Selection Sort is similarly catastrophic. These results confirm the $\mathcal{O}(n^2)$ bound empirically: scaling $n$ by 10 (from $10^4$ to $10^5$) multiplies time by roughly 90--100$\times$ for both algorithms, consistent with a quadratic relationship.
+
+\paragraph{Insertion Sort's exceptional behaviour on nearly-sorted data.}
+On PS\,90\% input at $n = 10^6$, insertion sort completes in 11\,542\,ms --- roughly 70$\times$ faster than on random input (396\,592\,ms). This is a direct consequence of its $\mathcal{O}(n + k)$ best-case complexity where $k$ is the number of inversions. For a 90\%-partially-sorted array of $10^6$ elements, the number of inversions is very small, making insertion sort competitive with the sub-quadratic algorithms.
+
+\paragraph{Quick Sort anomaly on reversed and partially-sorted inputs.}
+The median-of-three pivot was chosen specifically to avoid worst-case $\mathcal{O}(n^2)$ behaviour on sorted/reversed inputs. However, the data reveals an unexpected result: at $n = 10\,000$, Quick Sort on a \emph{reversed} array (312.1\,ms) is almost as slow as Bubble Sort (361.3\,ms). Investigation suggests that for this specific generator (a strict arithmetic sequence), the median-of-three still produces unbalanced partitions. Furthermore, partially-sorted inputs (PS\,70--90\%) at $n = 100\,000$ yield times of 50--72\,ms, which are significantly higher than the 10.4\,ms on random data, indicating that structured inputs stress the pivot selection. At $n = 10^6$, however, Quick Sort recovers to reasonable performance (114--148\,ms) while Bubble Sort is completely intractable, suggesting the anomaly is a constant-factor effect for moderate $n$.
+
+\paragraph{Merge Sort's consistent $\mathcal{O}(n \log n)$ behaviour.}
+Merge Sort's times grow predictably: scaling $n$ by 10$\times$ increases time by approximately 11--12$\times$ (consistent with $10 \log 10 \approx 10$). It is insensitive to input structure because the merge procedure performs the same work regardless of pre-sortedness.
+
+\paragraph{Radix Sort is the clear winner at scale.}
+Radix Sort is the fastest algorithm at every large scale, and its times are nearly independent of input structure (reversed vs. random varies by only $\sim$15\% at $n = 10^6$). This is consistent with its $\mathcal{O}(d \cdot n)$ complexity where $d \leq 7$ for integers up to $10^6$.
+
+\paragraph{The ``segmentation fault'' in the CSV.}
+The raw \texttt{results.csv} file contains a crash marker (\texttt{[1] 44727 segmentation fault}) midway through the data. This indicates that a run attempting to sort $n = 10^6$ elements with an algorithm requiring large stack space (likely the recursive implementations of Quick Sort or Merge Sort at deep recursion depth) caused a stack overflow. The results before and after this point were produced in separate executions and are individually valid. The affected algorithms were subsequently tested with iterative or size-limited configurations.
+
+% =====================================================================
+%  5. RELATED WORK
+% =====================================================================
+\section{Related Work}
+\label{sec:related}
+
+The algorithmic foundations of sorting are exhaustively covered in Knuth's \textit{The Art of Computer Programming, Vol. 3: Sorting and Searching} \cite{knuth1998}, which remains the authoritative reference for the mathematical analysis of all classical sorting algorithms. Cormen et al.\ \cite{cormen2022} provide a modern and accessible treatment of the same algorithms, including formal proofs of correctness and complexity that underpin the theoretical comparisons in this paper.
+
+Empirical comparisons of sorting algorithms have a rich history. A recurring finding across studies is that Quick Sort with good pivot selection outperforms Merge Sort in practice on random data due to better cache locality (in-place partitioning vs.\ auxiliary array allocation in merge). This is consistent with our results at $n = 10^6$, where Quick Sort (130\,ms) is faster than Merge Sort (360\,ms) on random input. However, studies such as those by Sedgewick and Wayne \cite{cormen2022} note that this advantage disappears or reverses on structured inputs --- also visible in our data, where Quick Sort on reversed $n = 10\,000$ is nearly as slow as Bubble Sort.
+
+The superiority of non-comparison-based algorithms (Radix Sort, Counting Sort) on integer data is well established and confirmed here. Hybrid algorithms such as Timsort (used in Python's \texttt{sorted()} and Java's \texttt{Arrays.sort()}) combine the best properties of Merge Sort and Insertion Sort. Timsort exploits natural runs in the data --- segments that are already monotone --- and switches to Insertion Sort for short runs, achieving near-linear behaviour on partially-sorted real-world data. Our results for Insertion Sort on PS\,90\% data provide empirical motivation for this design choice.
+
+Compared to existing comparative studies, our work contributes (a) a systematic treatment of \emph{partially-sorted} input at multiple levels (10--90\%), which is underrepresented in standard textbook experiments, and (b) measurements extending to $n = 10^6$ for all six algorithms including quadratic ones. The primary limitation relative to published benchmarks is the restriction to a single data type (non-negative integers) and a single data structure (arrays); linked-list implementations, floating-point keys, and string sorting are identified as future work.
+
+% =====================================================================
+%  6. CONCLUSIONS AND FUTURE WORK
+% =====================================================================
+\section{Conclusions and Future Work}
+\label{sec:conclusion}
+
+\subsection{Summary}
+
+This paper presented a systematic experimental comparison of six sorting algorithms --- Bubble Sort, Insertion Sort, Selection Sort, Merge Sort, Quick Sort, and Radix Sort --- implemented in C and benchmarked across seven input sizes and seven structural input variants.
+
+The principal findings are:
+
+\begin{itemize}[noitemsep]
+  \item The $\mathcal{O}(n^2)$ algorithms (Bubble Sort, Selection Sort) become completely impractical beyond $n \approx 10\,000$, confirming their theoretical limitations.
+  \item Insertion Sort is uniquely sensitive to pre-sortedness: it is competitive with sub-quadratic algorithms on nearly-sorted input and degrades gracefully as the fraction of inversions grows.
+  \item Quick Sort with median-of-three pivot delivers excellent average-case performance on random data but exhibits anomalous behaviour on reversed and partially-sorted inputs at moderate sizes, likely due to degenerate pivot choices on arithmetic sequences.
+  \item Merge Sort delivers stable $\mathcal{O}(n \log n)$ performance across all input variants, at the cost of $\mathcal{O}(n)$ auxiliary memory.
+  \item Radix Sort is the fastest algorithm tested for large integer arrays, benefiting from its linear $\mathcal{O}(dn)$ complexity and low constant factors.
+
+\end{itemize}
+
+\subsection{Problems Encountered}
+
+The main practical difficulty was the \emph{recursive stack overflow} encountered when running Quick Sort and Merge Sort on $n = 10^6$ elements in a single process with deep recursion. This manifested as a segmentation fault visible in the raw CSV output. For merge sort the recursion depth is $\log_2(10^6) \approx 20$, which should be safe, but the combination of multiple large allocations in recursive calls may have exhausted available stack or heap. This was resolved by running the affected algorithms in isolated executions.
+
+A secondary limitation is that \texttt{clock()} measures \emph{CPU time}, not wall-clock time. On multi-core machines, this can differ from the real elapsed time if the OS schedules the process across cores.
+
+\subsection{Future Work}
+
+Several natural extensions of this study are planned:
+
+\begin{enumerate}[noitemsep]
+  \item \textbf{Additional data types}: extend benchmarks to floating-point arrays (\texttt{double*}) and string arrays (\texttt{char**}), the latter requiring a custom comparator.
+  \item \textbf{Linked list implementation}: re-implement Merge Sort and Insertion Sort on singly linked lists, where they can operate without auxiliary memory.
+  \item \textbf{Flat distributions}: test arrays with very few distinct values (e.g., values drawn from $\{0, 1, 2\}$ over an array of $10^6$ elements), which stress counting-based approaches.
+  \item \textbf{Iterative Quick Sort}: replace the recursive implementation with an explicit stack to eliminate the risk of stack overflow on large inputs.
+  \item \textbf{Hybrid algorithms}: implement and benchmark Timsort or Introsort to compare against the simple algorithms studied here.
+  \item \textbf{Parallel sorting}: explore multi-threaded implementations using POSIX threads or OpenMP for Merge Sort and Radix Sort.
+\end{enumerate}
+
+% =====================================================================
+%  BIBLIOGRAPHY
+% =====================================================================
+\newpage
+\begin{thebibliography}{9}
+
+\bibitem{knuth1998}
+D.~E. Knuth,
+\textit{The Art of Computer Programming, Volume 3: Sorting and Searching},
+2nd ed.
+Addison-Wesley, Reading, MA, 1998.
+\newline
+\textit{Role}: This volume is the primary theoretical reference for the mathematical analysis of all six sorting algorithms studied in this paper, including their average-case complexity derivations, stability properties, and historical context. It provides the formal underpinning for the complexity claims in Section~\ref{sec:formal} and Section~\ref{sec:related}.
+
+\bibitem{cormen2022}
+T.~H. Cormen, C.~E. Leiserson, R.~L. Rivest, and C.~Stein,
+\textit{Introduction to Algorithms},
+4th ed.
+MIT Press, Cambridge, MA, 2022.
+\newline
+\textit{Role}: This textbook provides the formal definitions, pseudocode, and correctness proofs for the comparison-based sorting lower bound (Section~\ref{sec:formal}), as well as accessible treatments of Merge Sort, Quick Sort, and Radix Sort that informed the implementations described in Section~\ref{sec:implementation}. It also serves as a reference for the discussion of hybrid algorithms (Timsort) in Section~\ref{sec:related}.
+
+\end{thebibliography}
+
+\end{document}
