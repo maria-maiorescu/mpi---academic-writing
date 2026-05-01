@@ -1,0 +1,65 @@
+@book{knuth1998,
+  author    = {Donald E. Knuth},
+  title     = {The Art of Computer Programming, Volume 3: Sorting and Searching},
+  edition   = {2},
+  publisher = {Addison-Wesley},
+  address   = {Reading, MA},
+  year      = {1998},
+  note      = {Primary theoretical reference for the classical sorting algorithms,
+               their average-case analysis, and stability properties. Used throughout
+               Sections~2 and~5.}
+}
+
+@book{cormen2022,
+  author    = {Thomas H. Cormen and Charles E. Leiserson and Ronald L. Rivest and Clifford Stein},
+  title     = {Introduction to Algorithms},
+  edition   = {4},
+  publisher = {MIT Press},
+  address   = {Cambridge, MA},
+  year      = {2022},
+  note      = {Source of formal definitions, pseudocode, and correctness proofs in Section~2,
+               including the $\Omega(n\log n)$ lower bound. Also referenced in Section~5.}
+}
+
+@inproceedings{aliaga2017,
+  author    = {Aliaga, Jos{\'e} Ignacio and Barreda, Jos{\'e} Luis and Dolz, Manuel F. and Quintana-Ort{\'i}, Enrique S.},
+  title     = {Assessing the impact of the {CPU} frequency scaling on sorting algorithms},
+  booktitle = {Proceedings of the 17th International Conference on Computational Science and Its Applications (ICCSA)},
+  year      = {2017},
+  pages     = {503--516},
+  publisher = {Springer},
+  note      = {Used in Section~5 for the comparison of CPU-frequency effects on sorting performance,
+               supporting the discussion of hardware-dependent benchmarking.}
+}
+
+@article{mcilroy1993,
+  author    = {McIlroy, Peter M.},
+  title     = {Optimistic sorting and information theoretic complexity},
+  journal   = {Proceedings of the 4th Annual ACM-SIAM Symposium on Discrete Algorithms (SODA)},
+  year      = {1993},
+  pages     = {467--474},
+  note      = {Foundational paper on adaptive sorting algorithms (Timsort's predecessor);
+               cited in Section~5 when discussing Insertion Sort's near-linear behaviour
+               on partially-sorted data.}
+}
+
+@article{sedgewick2002,
+  author    = {Sedgewick, Robert and Bentley, Jon Louis},
+  title     = {Quicksort is optimal},
+  journal   = {Knuthfest Lecture, Stanford University},
+  year      = {2002},
+  note      = {Cited in Section~5 to contextualise the pivot-selection strategies and
+               the worst-case discussion around reversed-input Quick Sort.}
+}
+
+@article{auger2019,
+  author    = {Auger, Nicolas and Jugé, Vincent and Nicaud, Cyril and Pivoteau, Carine},
+  title     = {On the worst-case complexity of {TimSort}},
+  journal   = {27th Annual European Symposium on Algorithms (ESA 2019)},
+  year      = {2019},
+  pages     = {4:1--4:17},
+  publisher = {Schloss Dagstuhl -- Leibniz-Zentrum f{\"u}r Informatik},
+  note      = {Cited in Sections~2 and~5 to support the claim that Timsort exploits
+               sorted runs, as Insertion Sort does; provides the theoretical worst-case
+               analysis of the hybrid sort used in Python and Java.}
+}

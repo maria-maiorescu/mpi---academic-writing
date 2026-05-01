@@ -37,11 +37,25 @@ The reported value for each configuration is the **average elapsed time in milli
 
 | File | Description |
 |---|---|
-| `algorithms.c` | Full C implementation: data generators, all six sorting algorithms, timing, and CSV output |
-| `results.csv` | Raw benchmark results (`n, runs, algorithm, variant, avg_ms`) |
-| `sorting_performance_paper.tex` | Main LaTeX paper |
+| `algorithms.c` | C99 source: data generators, six sorting algorithms, timing harness, CSV output |
+| `results.csv` | Raw benchmark results (`Elements, Runs, Algorithm, Variant, Elapsed time(ms)`) |
+| `sorting_paper.tex` | Main LaTeX paper (compile with `pdflatex → bibtex → pdflatex × 2`) |
+| `sorting_paper.bib` | BibTeX bibliography (Knuth, CLRS, and four supplementary sources) |
+| `sorting_paper_backup.tex` | Backup of original paper before the major rewrite |
+| `notes for the paper.txt` | Professor feedback notes used to guide revisions |
 
+## Compiling the Paper
+
+```bash
+pdflatex sorting_paper.tex
+bibtex sorting_paper
+pdflatex sorting_paper.tex
+pdflatex sorting_paper.tex
+```
+
+Requires a TeX Live installation with `pgfplots`, `algorithmicx`, `listings`, and `booktabs`.
 
 ## About
 
-Written for the *Academic Writing* course, Year 1 Computer Science, West University of Timișoara.
+Written for the *Academic Writing* course, Year 1 Computer Science, West University of Timișoara.  
+Author: Maria Maiorescu — maria.maiorescu06@e-uvt.ro

@@ -1,0 +1,9 @@
+- add graphics - for each type of sorting algorithm (one graphic that contains all the algorithms) - and use some symbols on the graphics (for the different types of sort) so that it can be understood even if the reader hasn't colors n the screen
+- tables to be able to check the correct timing (much space occupied) - add a summary table with the complexity (chapter algorithmic complexity)
+- replace the C code with pseudocode (make it really easy to understand it - so that even a 5 year old can understand it) - keep it short and move it to appendix
+- simplify much the user manual - remove the code there and explain in short and simpler that section
+- related work - search what others did about this subject (search similar research papers on: easychair and google scholar) -> include advantages & disadvantages and add them to the bibliography (references)
+- for the references use bibTex
+- future work - include what we achieved and what not (if there are any problems, mention them and if you have any idea(s) on how to solve them (even if you won't solve them in the future)), examples:
+-- add more data types (strings, lists, etc)
+-- run the tests against other computer, with different CPU/memory to see which one influences more the results 

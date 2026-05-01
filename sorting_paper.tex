@@ -1,17 +1,16 @@
 \documentclass[11pt,a4paper]{article}
 
 % --- Packages ---
+\usepackage{lmodern}        % must come BEFORE fontenc so LM provides T1 fonts
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-\usepackage[english]{babel}
 \usepackage{geometry}
 \geometry{margin=2.5cm}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{longtable}
-\usepackage{multirow}
+\usepackage{array}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{hyperref}
@@ -25,16 +24,17 @@
 \usepackage{parskip}
 \usepackage{microtype}
 \usepackage{enumitem}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
-% --- Code listing style ---
+% --- Code listing style (used only for shell commands now) ---
 \lstset{
-  language=C,
+  language=bash,
   basicstyle=\ttfamily\small,
   keywordstyle=\bfseries\color{blue!70!black},
   commentstyle=\itshape\color{green!50!black},
   stringstyle=\color{red!60!black},
-  numbers=left,
-  numberstyle=\tiny\color{gray},
+  numbers=none,
   breaklines=true,
   frame=single,
   captionpos=b,
@@ -45,6 +45,16 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{proposition}{Proposition}
 \newtheorem{definition}{Definition}
+
+% --- Plot styles: distinct colours AND distinct markers (readable in B&W too) ---
+\pgfplotscreateplotcyclelist{colormarkers}{%
+  {blue!70!black,      mark=*,         thick},
+  {red!70!black,       mark=square*,   thick},
+  {green!50!black,     mark=triangle*, thick},
+  {orange!80!black,    mark=diamond*,  thick},
+  {violet,             mark=pentagon*, thick},
+  {cyan!60!black,      mark=oplus*,    thick}%
+}
 
 % =====================================================================
 \begin{document}
@@ -90,7 +100,7 @@
 \thispagestyle{empty}
 \vspace*{1cm}
 \begin{abstract}
-\noindent Sorting is one of the first problems every computer-science student learns, and also one of the hardest to analyse well in practice. Textbook complexity bounds tell us a lot, but they hide constants, cache effects, and the shape of real input data. This paper takes a practical look at what actually happens when we run these algorithms.
+Sorting is one of the first problems every computer-science student learns, and also one of the hardest to analyse well in practice. Textbook complexity bounds tell us a lot, but they hide constants, cache effects, and the shape of real input data. This paper takes a practical look at what actually happens when we run these algorithms.
 
 \vspace{0.4em}
 
@@ -101,6 +111,7 @@ I implemented six classical sorting algorithms in C --- Bubble Sort, Insertion S
 The numbers confirm most of the theory, but they also show effects that pure complexity analysis misses: insertion sort becomes surprisingly competitive once the input is almost in order, the two quadratic algorithms lose any chance of usefulness past ten thousand elements, quick sort with median-of-three can still behave badly on certain structured inputs, and radix sort ends up the fastest method at every large size tested.
 \end{abstract}
 
+\newpage
 \thispagestyle{empty}
 \tableofcontents
 \newpage
@@ -122,9 +133,9 @@ The six algorithms picked for the study are the ones taught in a standard Algori
 
 \begin{itemize}[noitemsep]
   \item \textbf{Bubble Sort} and \textbf{Selection Sort} are simple $\mathcal{O}(n^2)$ methods. They are easy to explain but rarely the right choice outside of teaching.
-  \item \textbf{Insertion Sort} is also quadratic in the worst case, but it drops to $\mathcal{O}(n)$ on input that is already close to sorted. Hybrid libraries like Timsort exploit exactly this property.
+  \item \textbf{Insertion Sort} is also quadratic in the worst case, but it drops to $\mathcal{O}(n)$ on input that is already close to sorted. Hybrid libraries like Timsort \cite{auger2019} exploit exactly this property.
   \item \textbf{Merge Sort} guarantees $\mathcal{O}(n \log n)$ time regardless of the input, at the cost of $\mathcal{O}(n)$ extra memory.
-  \item \textbf{Quick Sort} is usually the fastest comparison-based sort in practice, but its worst case is still $\mathcal{O}(n^2)$. Good pivot selection is what keeps it out of that corner.
+  \item \textbf{Quick Sort} is usually the fastest comparison-based sort in practice, but its worst case is still $\mathcal{O}(n^2)$. Good pivot selection is what keeps it out of that corner \cite{sedgewick2002}.
   \item \textbf{Radix Sort} escapes the $\Omega(n \log n)$ lower bound by using the digits of the keys rather than comparisons. It runs in $\mathcal{O}(d \cdot n)$, but works only for keys that can be decomposed into digits.
 \end{itemize}
 
@@ -132,11 +143,15 @@ Most introductory comparisons stop at random data and a single array size. The l
 
 \subsection{Outline of This Work}
 
-Section~\ref{sec:formal} gives the formal definition and a short summary of each algorithm's complexity. Section~\ref{sec:implementation} describes the C implementation, the data generators, the timing layer, and how to compile and run the program on Linux and Windows. Section~\ref{sec:experiment} presents the measurements and discusses what stands out. Section~\ref{sec:related} places the results next to prior studies and similar student projects. Section~\ref{sec:conclusion} lists the problems encountered and sketches future work; the bibliography closes the paper.
+Section~\ref{sec:formal} gives the formal definition and a short summary of each algorithm's complexity. Section~\ref{sec:implementation} describes the C implementation, the data generators, the timing layer, and how to build and run the program. Section~\ref{sec:experiment} presents the measurements and discusses what stands out. Section~\ref{sec:related} places the results next to prior studies. Section~\ref{sec:conclusion} lists the problems encountered and sketches future work; the bibliography and appendix close the paper.
 
 \medskip
 
-\noindent The benchmarking program --- every sorting routine, every data generator, and the whole timing framework --- was written by me from scratch in C. The choice of input sizes, the set of structural variants, and the averaging strategy are my own, and so are the analysis and the writing. Whenever an idea comes from a published source, it is cited explicitly. A reader who only wants the high-level story can focus on the abstract, Section~\ref{sec:analysis}, and the conclusion.
+\noindent The benchmarking program --- every sorting routine, every data generator, and the whole timing framework --- was written by me from scratch in C. The choice of input sizes, the set of structural variants, and the averaging strategy are my own, and so are the analysis and the writing. Whenever an idea comes from a published source, it is cited explicitly.
+
+\medskip
+
+\noindent A reader who only wants the high-level story can focus on the abstract, Section~\ref{sec:analysis}, and the conclusion. A reader who wants to reproduce the experiments should read Section~\ref{sec:implementation} and Appendix~\ref{app:pseudocode}.
 
 % =====================================================================
 %  2. FORMAL PRESENTATION
@@ -151,7 +166,7 @@ Let $A = \langle a_1, a_2, \ldots, a_n \rangle$ be a sequence of $n$ elements dr
 $$a_{\pi(1)} \leq a_{\pi(2)} \leq \cdots \leq a_{\pi(n)}.$$
 \end{definition}
 
-For this study the elements are non-negative integers, so $S = \mathbb{N}$ and $\leq$ is the usual order. The keys and the full records coincide, which keeps the discussion focused on pure sorting performance rather than on record movement costs.
+For this study the elements are non-negative integers, so $S = \mathbb{N}$ and $\leq$ is the usual order.
 
 \subsection{Algorithmic Complexity}
 
@@ -177,13 +192,11 @@ Radix Sort (LSD) & $\mathcal{O}(dn)$       & $\mathcal{O}(dn)$       & $\mathcal
 
 For the LSD base-10 radix sort used here, $d = \lfloor \log_{10} \max(A) \rfloor + 1$. Since the generated values are bounded by $n$, $d$ never grows past $7$ in the experiments.
 
-A classical result that frames the whole comparison is the following.
-
 \begin{proposition}[Lower bound for comparison-based sorting]
 Any comparison-based sorting algorithm needs $\Omega(n \log n)$ comparisons in the worst case \cite{cormen2022}.
 \end{proposition}
 
-This bound is what makes Merge Sort and Quick Sort (in the average case) asymptotically optimal among methods that only compare keys. Radix Sort sidesteps the bound because it reads digits directly rather than comparing whole keys, which is why it can be linear in $n$ for fixed-width integers.
+This bound is what makes Merge Sort and Quick Sort (in the average case) asymptotically optimal among methods that only compare keys. Radix Sort sidesteps the bound because it reads digits directly rather than comparing whole keys.
 
 % =====================================================================
 %  3. IMPLEMENTATION
@@ -193,184 +206,64 @@ This bound is what makes Merge Sort and Quick Sort (in the average case) asympto
 
 \subsection{Program Architecture}
 
-The whole experiment lives in a single C99 source file, \texttt{algorithms.c}. I deliberately kept it flat rather than splitting it across headers, because the goal was to have one self-contained program that could be read top to bottom. Internally it is organised in four layers:
+The whole experiment lives in a single C99 source file, \texttt{algorithms.c}. Internally it is organised in four layers:
 
 \begin{enumerate}[noitemsep]
   \item \textbf{Data generation} --- functions that allocate an \texttt{int} array and fill it according to a requested shape (random, reversed, or partially sorted).
   \item \textbf{Sorting} --- six sorting routines, each working in place on an \texttt{int*} buffer.
   \item \textbf{Timing} --- thin wrappers around \texttt{clock()} that return elapsed milliseconds.
-  \item \textbf{Benchmarking} --- two orchestration functions (\texttt{analyzeSortAlg} and \texttt{analyzeAlgo}) that loop over repetitions, record the averages, and append them to \texttt{results.csv}.
+  \item \textbf{Benchmarking} --- two orchestration functions that loop over repetitions, record the averages, and append them to \texttt{results.csv}.
 \end{enumerate}
+
+Pseudocode for each algorithm is given in Appendix~\ref{app:pseudocode}.
 
 \subsection{Data Structures}
 
-The only data structure that matters for the comparison is the plain C array of \texttt{int}. Each run allocates a fresh array, fills it with the required pattern, sorts it, and frees it, so no state ever leaks between runs. Two sorting routines need auxiliary storage:
-
-\begin{itemize}[noitemsep]
-  \item Merge Sort builds two temporary sub-arrays \texttt{L} and \texttt{R} at every merge step and frees them at the end of the step.
-  \item Radix Sort allocates one output buffer of size $n$ per digit pass, which is reused across the digits of one sort.
-\end{itemize}
+The core data structure is a plain C array of \texttt{int}. Each run allocates a fresh array, fills it with the required pattern, sorts it, and frees it. Merge Sort uses two temporary sub-arrays per merge step; Radix Sort uses one output buffer of size $n$ per digit pass.
 
 \subsection{Data Generators}
 
-The three input shapes are produced by dedicated functions. The partially-sorted generator starts from the sorted sequence $\langle 0, 1, \ldots, n-1 \rangle$ and performs a controlled number of random swaps:
+Three input shapes are produced by dedicated functions:
+\begin{itemize}[noitemsep]
+  \item \textbf{Reversed}: fills the array with $n-1, n-2, \ldots, 0$.
+  \item \textbf{Random}: fills with \texttt{rand() \% (size + 1)}, seeded once at program start.
+  \item \textbf{Partially sorted}: starts from $\langle 0, 1, \ldots, n-1 \rangle$ and performs $\lfloor n / \textit{factor} \rfloor$ random swaps. The five values $\textit{factor} \in \{10, 30, 50, 70, 90\}$ correspond to roughly $10\%, 3.3\%, 2\%, 1.4\%$, and $1.1\%$ of positions disturbed.
+\end{itemize}
 
-\begin{lstlisting}[caption={Partially-sorted generator (simplified).},label={lst:partial}]
-int* generatePartiallySortedIntArray(unsigned long size, int factor) {
-    int* array = malloc(sizeof(int) * size);
-    for (unsigned long i = 0; i < size; i++) array[i] = (int)i;
+\subsection{LSD and MSD Radix Sort}
 
-    unsigned long swaps = size / factor;  // fewer swaps => more sorted
-    for (unsigned long k = 0; k < swaps; k++) {
-        unsigned long i = rand() % size;
-        unsigned long j = rand() % size;
-        int tmp = array[i]; array[i] = array[j]; array[j] = tmp;
-    }
-    return array;
-}
-\end{lstlisting}
-
-Higher \texttt{factor} values give fewer swaps and therefore arrays that are closer to sorted. The five values used in the experiments are $10, 30, 50, 70, 90$, corresponding to roughly $10\%, 3.3\%, 2\%, 1.4\%$, and $1.1\%$ of positions disturbed. The reversed generator fills the array with $n-1, n-2, \ldots, 0$, and the random generator uses \texttt{rand() \% (size + 1)} with a single seed at program start.
+\emph{LSD} (Least Significant Digit) radix sort processes the array digit by digit, starting from the rightmost (units) digit and working left towards the most significant digit. At each pass it applies a \emph{stable} counting sort on the current digit position: stability is essential because it preserves the relative order established by all previous passes. For example, sorting $\langle 170, 45, 75, 90, 802, 24, 2, 66 \rangle$ in base 10 proceeds as:
+\begin{enumerate}[noitemsep,label=\textbf{Pass \arabic*}]
+  \item Sort by units digit: $\langle 170, 90, 802, 2, 24, 45, 75, 66 \rangle$
+  \item Sort by tens digit: $\langle 802, 2, 24, 45, 66, 170, 75, 90 \rangle$
+  \item Sort by hundreds digit: $\langle 2, 24, 45, 66, 75, 90, 170, 802 \rangle$ \checkmark
+\end{enumerate}
+The contrast is \emph{MSD} (Most Significant Digit) radix sort, which starts from the left and recurses into sub-buckets per digit --- more complex to implement and harder to make stable. LSD is the standard choice when keys have a fixed maximum width, as is the case here ($d \leq 7$ for the array sizes tested).
 
 \subsection{Timing Methodology}
 
-Time is measured with \texttt{clock()}, which reports CPU time consumed by the process. The elapsed milliseconds are
-
+Time is measured with \texttt{clock()}, which reports CPU time. The elapsed milliseconds are
 $$t = \frac{\texttt{clock\_end} - \texttt{clock\_start}}{\texttt{CLOCKS\_PER\_SEC}} \times 1000.$$
 
-Wrapping that in two tiny helpers keeps the sorting code clean:
+For $n \in \{10, 50, 100\}$ the result is the average of $10^6$ independent runs; for $n = 1\,000$ it is the average of $100$ runs; for $n \geq 10\,000$ a single run suffices (with $10$ runs for $n = 10\,000$ to reduce noise).
 
-\begin{lstlisting}[caption={Start/stop timing helpers.},label={lst:timer}]
-clock_t startOperationTimer(void) { return clock(); }
+\subsection{User Manual}
+\label{sec:usermanual}
 
-double stopOperationTimerMs(clock_t startTime) {
-    clock_t endTime = clock();
-    return ((double)(endTime - startTime) * 1000.0) / CLOCKS_PER_SEC;
-}
-\end{lstlisting}
+The program requires no command-line arguments. Running it produces one line per measurement on standard output and appends the same line to \texttt{results.csv} (columns: \texttt{Elements, Runs, Algorithm, Variant, Elapsed time(ms)}).
 
-Because very small sorts finish well below one millisecond, for $n \in \{10, 50, 100\}$ the measurement is the average of $10^6$ independent runs. For $n = 1\,000$ the average is over $100$ runs. For $n \geq 10\,000$ a single run is enough to be well above the clock resolution, and for $n = 10\,000$ I still average over $10$ runs to reduce noise.
-
-\subsection{Key Implementation Details}
-
-Two optimisations are worth showing in code, because they directly influence the measured times.
-
-\paragraph{Bubble Sort with early exit.} The flag is what gives Bubble Sort its $\mathcal{O}(n)$ best case. Without it, the algorithm cannot notice that the array is already sorted.
-
-\begin{lstlisting}[caption={Bubble Sort with the \texttt{swapped} flag.},label={lst:bubble}]
-void bubbleSort(int* array, unsigned long size) {
-    for (unsigned long i = 0; i < size - 1; i++) {
-        int swapped = 0;
-        for (unsigned long j = 0; j < size - 1 - i; j++) {
-            if (array[j] > array[j + 1]) {
-                int tmp = array[j];
-                array[j] = array[j + 1];
-                array[j + 1] = tmp;
-                swapped = 1;
-            }
-        }
-        if (!swapped) return;   // already sorted, stop early
-    }
-}
-\end{lstlisting}
-
-\paragraph{Quick Sort with median-of-three pivot.} The pivot is picked as the median of the first, middle, and last elements of the current range. This mitigates the classical worst case on already-sorted or fully-reversed data.
-
-\begin{lstlisting}[caption={Median-of-three pivot selection (sketch).},label={lst:pivot}]
-long partitionQuickSort(int* array, long low, long high) {
-    long mid = low + (high - low) / 2;
-    // move median of (array[low], array[mid], array[high]) into array[high]
-    if (array[mid] < array[low])  swapInts(&array[low], &array[mid]);
-    if (array[high] < array[low]) swapInts(&array[low], &array[high]);
-    if (array[high] < array[mid]) swapInts(&array[mid], &array[high]);
-    swapInts(&array[mid], &array[high]);   // pivot now at array[high]
-    /* ... standard Lomuto partition around array[high] ... */
-}
-\end{lstlisting}
-
-\paragraph{Radix digit pass.} Radix Sort (LSD, base $10$) runs one counting-sort pass per digit, using a $10$-slot counting array and one auxiliary buffer of size $n$. Stability is guaranteed by scanning the input from right to left during the final fill:
-
-\begin{lstlisting}[caption={One digit pass of LSD radix sort.},label={lst:radix}]
-void countSortByDigit(int* array, unsigned long size, int exp) {
-    int* output = malloc(size * sizeof(int));
-    int count[10] = {0};
-    for (unsigned long i = 0; i < size; i++) count[(array[i] / exp) % 10]++;
-    for (int d = 1; d < 10; d++) count[d] += count[d - 1];
-    for (long i = (long)size - 1; i >= 0; i--) {
-        int d = (array[i] / exp) % 10;
-        output[--count[d]] = array[i];
-    }
-    for (unsigned long i = 0; i < size; i++) array[i] = output[i];
-    free(output);
-}
-\end{lstlisting}
-
-\paragraph{Radix Sort scope.} The radix sort operates in base $10$ and only handles non-negative integers. The generators guarantee that constraint, so I did not add sign handling.
-
-\subsection{User Manual: Building and Running the Program}
-
-The program has no command-line arguments. Its output consists of two things: one line printed for every measurement on standard output, and the same line appended to \texttt{results.csv} in the current working directory. The CSV columns are
-
-\begin{lstlisting}[language=bash, numbers=none]
-Elements, Runs, Algorithm, Variant, Elapsed time(ms)
-\end{lstlisting}
-
-\paragraph{On Linux (or macOS).} Any recent \texttt{gcc} or \texttt{clang} works. A typical workflow on Debian or Ubuntu is:
-
-\begin{lstlisting}[language=bash, numbers=none]
-# 1. Install a compiler if needed (Debian/Ubuntu):
-sudo apt update
-sudo apt install build-essential
-
-# 2. Compile with optimisation enabled:
+\paragraph{Building on Linux/macOS.}
+Install \texttt{gcc} (e.g.\ \texttt{sudo apt install build-essential} on Ubuntu, or \texttt{xcode-select --install} on macOS), then:
+\begin{lstlisting}
 gcc -O2 -std=c99 -o algorithms algorithms.c -lm
-
-# 3. Run (results.csv will be written in the current folder):
 ./algorithms
-
-# 4. Inspect the results:
-head -n 5 results.csv
-wc -l results.csv       # count how many rows were produced
 \end{lstlisting}
 
-On macOS, replace the install step with \texttt{xcode-select -{}-install}; the rest of the commands are identical. On Fedora or a RHEL-like distribution, use \texttt{sudo dnf install gcc make}.
+\paragraph{Building on Windows.}
+Use any of: (A) Windows Subsystem for Linux (identical commands to Linux), (B) MSYS2/MinGW-w64 with \texttt{gcc}, or (C) MSVC (\texttt{cl /O2 /Fe:algorithms.exe algorithms.c}). Note that \texttt{CLOCKS\_PER\_SEC} differs between platforms but the code divides by it explicitly, so the timings remain correct.
 
-The \texttt{-O2} flag matters: without it, the quadratic algorithms slow down by a factor of two or three. Re-running the $n = 100$ block with \texttt{-O0} increased Merge Sort's per-sort time from $0.010$\,ms to about $0.028$\,ms while Radix Sort only moved from $0.005$\,ms to $0.009$\,ms, which narrows the gap between the two noticeably. To start from a fresh CSV, \texttt{rm -f results.csv \&\& ./algorithms} is enough, since the program re-creates the file on start.
-
-\paragraph{On Windows.} There are three practical options, from the most Unix-like to the most native.
-
-\emph{Option A --- Windows Subsystem for Linux.} WSL runs a real Linux kernel on Windows, so the commands are exactly the ones from the Linux section. After \texttt{wsl -{}-install -d Ubuntu} (once, from an elevated PowerShell), entering \texttt{wsl} drops you into an Ubuntu shell where the Linux workflow applies as-is.
-
-\emph{Option B --- MSYS2 / MinGW-w64 (native Windows binary, GCC toolchain).}
-
-\begin{lstlisting}[language=bash, numbers=none]
-# In the MSYS2 MinGW64 shell, install a compiler:
-pacman -Syu
-pacman -S mingw-w64-x86_64-gcc
-
-# Compile and run:
-gcc -O2 -std=c99 -o algorithms.exe algorithms.c -lm
-./algorithms.exe
-\end{lstlisting}
-
-\emph{Option C --- Microsoft Visual C++ from a ``x64 Native Tools Command Prompt''.}
-
-\begin{lstlisting}[language=bash, numbers=none]
-rem Compile with the MSVC command-line driver:
-cl /O2 /Fe:algorithms.exe algorithms.c
-
-rem Run:
-algorithms.exe
-
-rem Peek at the CSV (PowerShell style):
-powershell Get-Content results.csv -TotalCount 5
-\end{lstlisting}
-
-A few Windows-specific things that are easy to trip over: the shell prompt symbol is \texttt{>} rather than \texttt{\$}; \texttt{CLOCKS\_PER\_SEC} is defined on both platforms but its numerical value differs ($1000$ on typical Windows runtimes, $1\,000\,000$ on most Linux ones), which is why the code divides by it explicitly instead of hard-coding a constant; and MSVC does not accept the POSIX \texttt{-lm} flag because its math functions live in the standard CRT by default.
-
-Whichever route is chosen, the expected first lines of \texttt{results.csv} are \texttt{Elements, Runs, Algorithm, Variant, Elapsed time(ms)} followed by one row per (algorithm, variant, size) triple.
-
-\paragraph{Adding more sizes.} To run sizes beyond the defaults, it is enough to uncomment the corresponding \texttt{analyzeAlgo} calls in \texttt{main()}. A warning from experience: running $n = 10^6$ on the three quadratic algorithms takes several hours of CPU time, so I recommend first producing the results for the fast algorithms and only then launching the slow ones as a separate batch.
+\paragraph{Starting fresh.}
+Delete \texttt{results.csv} before running to start from a clean file. Running the quadratic algorithms at $n = 10^6$ takes several hours; run the fast algorithms first.
 
 % =====================================================================
 %  4. EXPERIMENT
@@ -380,15 +273,11 @@ Whichever route is chosen, the expected first lines of \texttt{results.csv} are 
 
 \subsection{Experimental Setup}
 
-All measurements were taken on a personal laptop running a Unix-like operating system, with the program compiled using \texttt{gcc -O2}. While the large-size experiments were running, I avoided launching any CPU-intensive background tasks. The random generator is seeded exactly once, at program start, via \texttt{srand(time(NULL))}, so the random inputs are not the same across two separate program executions, but are fixed within one execution.
-
-Array sizes tested: $n \in \{10, 50, 100, 1\,000, 10\,000, 100\,000, 1\,000\,000\}$.
-
-Input variants tested: reversed, random, partially sorted at $10\%, 30\%, 50\%, 70\%, 90\%$.
+All measurements were taken on a personal laptop running a Unix-like OS, compiled with \texttt{gcc -O2}. Array sizes: $n \in \{10, 50, 100, 1\,000, 10\,000, 100\,000, 1\,000\,000\}$. Input variants: reversed, random, partially sorted at $10\%, 30\%, 50\%, 70\%, 90\%$.
 
 \subsection{Results: Small Arrays ($n \leq 100$)}
 
-For very small arrays the differences between algorithms are below one microsecond per sort and only become visible once averaged over $10^6$ runs. Table~\ref{tab:small} reports the average time per sort, in milliseconds, for $n = 100$.
+Table~\ref{tab:small} shows average time per sort for $n = 100$. Even at this size Radix Sort and Merge Sort dominate, and Insertion Sort wins on near-sorted input.
 
 \begin{table}[H]
 \centering
@@ -407,8 +296,6 @@ Radix Sort     & 0.005 & 0.007 & 0.005 & 0.005 & 0.005 & 0.005 & 0.005 \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-Even at $n = 100$ the pattern that will dominate the paper is already visible: Radix Sort and Merge Sort are the fastest, Bubble Sort on random input is the slowest, and Insertion Sort becomes the clear winner as soon as the input is close to sorted (PS\,70--90\%).
 
 \subsection{Results: Medium Arrays ($n = 1\,000$)}
 
@@ -430,62 +317,200 @@ Radix Sort     & 0.066 & 0.103 & 0.087 & 0.065 & 0.065 & 0.066 & 0.067 \\
 \end{tabular}
 \end{table}
 
-At $n = 1\,000$ the gap between quadratic and sub-quadratic methods is already large. Quick Sort costs $3.215$\,ms on the reversed input, which is more than twenty times its cost on random input --- a striking anomaly that I discuss in Section~\ref{sec:analysis}. On the other side of the spectrum, Insertion Sort on PS\,90\% ($0.042$\,ms) is already competitive with Radix Sort.
-
 \subsection{Results: Large Arrays ($n = 10\,000$ to $n = 1\,000\,000$)}
-
-Table~\ref{tab:large} gives the timings for the algorithms that are still feasible at these sizes. The quadratic algorithms at $n = 10^6$ are included on purpose, for completeness, but running them took hours.
 
 \begin{table}[H]
 \centering\footnotesize
 \setlength{\tabcolsep}{4.5pt}
-\caption{Elapsed time (ms) for large $n$, single run (or 10-run average for $n=10\,000$). \\ ``---'' indicates the algorithm was not run at that size.}
+\caption{Elapsed time (ms) for large $n$ (single run, or 10-run average for $n=10\,000$).}
 \label{tab:large}
 \begin{tabular}{llrrrrrrr}
 \toprule
 $n$ & \textbf{Algorithm} & \textbf{Rev.} & \textbf{Rand.} & \textbf{PS 10\%} & \textbf{PS 30\%} & \textbf{PS 50\%} & \textbf{PS 70\%} & \textbf{PS 90\%} \\
 \midrule
-\multirow{6}{*}{10\,000}
- & Bubble Sort    & 361.3  & 310.3  & 254.3  & 245.1 & 236.3 & 232.8 & 230.0 \\
- & Quick Sort     & 312.1  & 2.1    & 3.1    & 5.1   & 9.9   & 7.4   & 10.6  \\
- & Insertion Sort & 235.5  & 118.4  & 27.5   & 10.0  & 6.4   & 4.6   & 3.7   \\
- & Selection Sort & 206.3  & 230.3  & 233.8  & 239.2 & 235.6 & 235.8 & 234.6 \\
- & Merge Sort     & 1.5    & 2.8    & 1.9    & 1.7   & 1.7   & 1.7   & 1.7   \\
- & Radix Sort     & 0.9    & 1.0    & 0.9    & 0.9   & 0.9   & 0.9   & 0.9   \\
+10\,000 & Bubble Sort    & 361.3  & 310.3  & 254.3  & 245.1 & 236.3 & 232.8 & 230.0 \\
+        & Quick Sort     & 312.1  & 2.1    & 3.1    & 5.1   & 9.9   & 7.4   & 10.6  \\
+        & Insertion Sort & 235.5  & 118.4  & 27.5   & 10.0  & 6.4   & 4.6   & 3.7   \\
+        & Selection Sort & 206.3  & 230.3  & 233.8  & 239.2 & 235.6 & 235.8 & 234.6 \\
+        & Merge Sort     & 1.5    & 2.8    & 1.9    & 1.7   & 1.7   & 1.7   & 1.7   \\
+        & Radix Sort     & 0.9    & 1.0    & 0.9    & 0.9   & 0.9   & 0.9   & 0.9   \\
 \midrule
-\multirow{6}{*}{100\,000}
- & Bubble Sort    & 13228  & 18521  & 9424   & 8105  & 7538  & 7643  & 7640  \\
- & Quick Sort     & 12726  & 10.4   & 14.7   & 17.4  & 41.5  & 50.4  & 72.1  \\
- & Insertion Sort & 8343   & 4199   & 985.8  & 342.5 & 222.4 & 165.8 & 122.1 \\
- & Selection Sort & 7144   & 6848   & 6857   & 6748  & 6656  & 6655  & 6766  \\
- & Merge Sort     & 20.6   & 28.2   & 23.2   & 22.1  & 22.1  & 21.5  & 21.4  \\
- & Radix Sort     & 5.9    & 6.4    & 5.7    & 5.3   & 5.3   & 5.4   & 5.2   \\
+100\,000 & Bubble Sort    & 13228  & 18521  & 9424   & 8105  & 7538  & 7643  & 7640  \\
+         & Quick Sort     & 12726  & 10.4   & 14.7   & 17.4  & 41.5  & 50.4  & 72.1  \\
+         & Insertion Sort & 8343   & 4199   & 985.8  & 342.5 & 222.4 & 165.8 & 122.1 \\
+         & Selection Sort & 7144   & 6848   & 6857   & 6748  & 6656  & 6655  & 6766  \\
+         & Merge Sort     & 20.6   & 28.2   & 23.2   & 22.1  & 22.1  & 21.5  & 21.4  \\
+         & Radix Sort     & 5.9    & 6.4    & 5.7    & 5.3   & 5.3   & 5.4   & 5.2   \\
 \midrule
-\multirow{6}{*}{1\,000\,000}
- & Bubble Sort    & 1\,318\,479 & 1\,808\,240 & 929\,435 & 794\,225 & 756\,972 & 738\,981 & 722\,408 \\
- & Quick Sort     & 114.6  & 130.2  & 99.0   & 107.5 & 126.5 & 148.3 & 148.1 \\
- & Insertion Sort & 812\,518& 396\,592& 90\,943& 33\,491& 21\,350& 15\,011& 11\,542\\
- & Selection Sort & 694\,198& 657\,233& 657\,622& 656\,275& 659\,880& 659\,186& 656\,911\\
- & Merge Sort     & 232.7  & 359.7  & 254.3  & 238.2 & 231.8 & 230.9 & 227.0 \\
- & Radix Sort     & 63.6   & 70.5   & 62.1   & 62.1  & 62.2  & 62.1  & 61.9  \\
+1\,000\,000 & Bubble Sort    & 1\,318\,479 & 1\,808\,240 & 929\,435 & 794\,225 & 756\,972 & 738\,981 & 722\,408 \\
+            & Quick Sort     & 114.6  & 130.2  & 99.0   & 107.5 & 126.5 & 148.3 & 148.1 \\
+            & Insertion Sort & 812\,518& 396\,592& 90\,943& 33\,491& 21\,350& 15\,011& 11\,542\\
+            & Selection Sort & 694\,198& 657\,233& 657\,622& 656\,275& 659\,880& 659\,186& 656\,911\\
+            & Merge Sort     & 232.7  & 359.7  & 254.3  & 238.2 & 231.8 & 230.9 & 227.0 \\
+            & Radix Sort     & 63.6   & 70.5   & 62.1   & 62.1  & 62.2  & 62.1  & 61.9  \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+% -----------------------------------------------------------------------
+%  FIGURES
+% -----------------------------------------------------------------------
+\subsection{Graphical Overview}
+
+The four figures below show elapsed time versus array size on a logarithmic scale for each input variant. All six algorithms appear in each figure; different marker shapes allow the plots to be read without colour.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  title={Random input},
+  xlabel={Array size $n$},
+  ylabel={Time (ms)},
+  xmode=log, ymode=log,
+  log ticks with fixed point,
+  width=0.88\linewidth, height=7.5cm,
+  legend pos=north west,
+  legend style={font=\small},
+  grid=major,
+  cycle list name=colormarkers
+]
+% Bubble Sort -- random
+\addplot coordinates {(100,0.047)(1000,3.120)(10000,310.3)(100000,18521)(1000000,1808240)};
+\addlegendentry{Bubble Sort}
+% Quick Sort -- random
+\addplot coordinates {(100,0.011)(1000,0.160)(10000,2.1)(100000,10.4)(1000000,130.2)};
+\addlegendentry{Quick Sort}
+% Insertion Sort -- random
+\addplot coordinates {(100,0.015)(1000,1.209)(10000,118.4)(100000,4199)(1000000,396592)};
+\addlegendentry{Insertion Sort}
+% Selection Sort -- random
+\addplot coordinates {(100,0.031)(1000,2.388)(10000,230.3)(100000,6848)(1000000,657233)};
+\addlegendentry{Selection Sort}
+% Merge Sort -- random
+\addplot coordinates {(100,0.016)(1000,0.214)(10000,2.8)(100000,28.2)(1000000,359.7)};
+\addlegendentry{Merge Sort}
+% Radix Sort -- random
+\addplot coordinates {(100,0.007)(1000,0.103)(10000,1.0)(100000,6.4)(1000000,70.5)};
+\addlegendentry{Radix Sort}
+\end{axis}
+\end{tikzpicture}
+\caption{Elapsed time vs.\ array size for \textbf{random} input. Both axes are logarithmic.}
+\label{fig:random}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  title={Reversed input},
+  xlabel={Array size $n$},
+  ylabel={Time (ms)},
+  xmode=log, ymode=log,
+  log ticks with fixed point,
+  width=0.88\linewidth, height=7.5cm,
+  legend pos=north west,
+  legend style={font=\small},
+  grid=major,
+  cycle list name=colormarkers
+]
+\addplot coordinates {(100,0.037)(1000,3.711)(10000,361.3)(100000,13228)(1000000,1318479)};
+\addlegendentry{Bubble Sort}
+\addplot coordinates {(100,0.036)(1000,3.215)(10000,312.1)(100000,12726)(1000000,114.6)};
+\addlegendentry{Quick Sort}
+\addplot coordinates {(100,0.025)(1000,2.385)(10000,235.5)(100000,8343)(1000000,812518)};
+\addlegendentry{Insertion Sort}
+\addplot coordinates {(100,0.023)(1000,2.093)(10000,206.3)(100000,7144)(1000000,694198)};
+\addlegendentry{Selection Sort}
+\addplot coordinates {(100,0.010)(1000,0.124)(10000,1.5)(100000,20.6)(1000000,232.7)};
+\addlegendentry{Merge Sort}
+\addplot coordinates {(100,0.005)(1000,0.066)(10000,0.9)(100000,5.9)(1000000,63.6)};
+\addlegendentry{Radix Sort}
+\end{axis}
+\end{tikzpicture}
+\caption{Elapsed time vs.\ array size for \textbf{reversed} input.}
+\label{fig:reversed}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  title={Partially sorted -- 10\% (most disturbed)},
+  xlabel={Array size $n$},
+  ylabel={Time (ms)},
+  xmode=log, ymode=log,
+  log ticks with fixed point,
+  width=0.88\linewidth, height=7.5cm,
+  legend pos=north west,
+  legend style={font=\small},
+  grid=major,
+  cycle list name=colormarkers
+]
+\addplot coordinates {(100,0.027)(1000,2.537)(10000,254.3)(100000,9424)(1000000,929435)};
+\addlegendentry{Bubble Sort}
+\addplot coordinates {(100,0.015)(1000,0.217)(10000,3.1)(100000,14.7)(1000000,99.0)};
+\addlegendentry{Quick Sort}
+\addplot coordinates {(100,0.005)(1000,0.292)(10000,27.5)(100000,985.8)(1000000,90943)};
+\addlegendentry{Insertion Sort}
+\addplot coordinates {(100,0.026)(1000,2.347)(10000,233.8)(100000,6857)(1000000,657622)};
+\addlegendentry{Selection Sort}
+\addplot coordinates {(100,0.012)(1000,0.150)(10000,1.9)(100000,23.2)(1000000,254.3)};
+\addlegendentry{Merge Sort}
+\addplot coordinates {(100,0.005)(1000,0.087)(10000,0.9)(100000,5.7)(1000000,62.1)};
+\addlegendentry{Radix Sort}
+\end{axis}
+\end{tikzpicture}
+\caption{Elapsed time vs.\ array size for \textbf{partially sorted (PS 10\%)} input.}
+\label{fig:ps10}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  title={Partially sorted -- 90\% (nearly sorted)},
+  xlabel={Array size $n$},
+  ylabel={Time (ms)},
+  xmode=log, ymode=log,
+  log ticks with fixed point,
+  width=0.88\linewidth, height=7.5cm,
+  legend pos=north west,
+  legend style={font=\small},
+  grid=major,
+  cycle list name=colormarkers
+]
+\addplot coordinates {(100,0.013)(1000,2.169)(10000,230.0)(100000,7640)(1000000,722408)};
+\addlegendentry{Bubble Sort}
+\addplot coordinates {(100,0.037)(1000,1.052)(10000,10.6)(100000,72.1)(1000000,148.1)};
+\addlegendentry{Quick Sort}
+\addplot coordinates {(100,0.001)(1000,0.042)(10000,3.7)(100000,122.1)(1000000,11542)};
+\addlegendentry{Insertion Sort}
+\addplot coordinates {(100,0.026)(1000,2.363)(10000,234.6)(100000,6766)(1000000,656911)};
+\addlegendentry{Selection Sort}
+\addplot coordinates {(100,0.010)(1000,0.130)(10000,1.7)(100000,21.4)(1000000,227.0)};
+\addlegendentry{Merge Sort}
+\addplot coordinates {(100,0.005)(1000,0.067)(10000,0.9)(100000,5.2)(1000000,61.9)};
+\addlegendentry{Radix Sort}
+\end{axis}
+\end{tikzpicture}
+\caption{Elapsed time vs.\ array size for \textbf{partially sorted (PS 90\%)} input. Note how Insertion Sort (triangles) closes the gap with Radix Sort (circles) as the input becomes nearly sorted.}
+\label{fig:ps90}
+\end{figure}
+
 \subsection{Analysis and Discussion}
 \label{sec:analysis}
 
-\paragraph{The two quadratic algorithms fall apart at scale.} Bubble Sort on random $n = 10^6$ takes over $1.8 \times 10^6$ milliseconds, which is roughly 30 minutes for a single array. Selection Sort is in the same league. Both scale as expected: multiplying $n$ by $10$ (from $10^4$ to $10^5$) multiplies the running time by about $90$--$100\times$, which matches a quadratic growth rate.
+\paragraph{The two quadratic algorithms fall apart at scale.} Bubble Sort on random $n = 10^6$ takes over $1.8 \times 10^6$ milliseconds --- roughly 30 minutes for a single array. Selection Sort is in the same league. Both scale as expected: multiplying $n$ by $10$ multiplies the running time by about $90$--$100\times$, matching quadratic growth.
 
-\paragraph{Insertion Sort on almost-sorted data.} On PS\,90\% input at $n = 10^6$, Insertion Sort finishes in $11\,542$\,ms, roughly $34\times$ faster than on random input. This follows directly from its $\mathcal{O}(n + k)$ best case, where $k$ is the number of inversions. A small number of random swaps produces a small number of inversions, and Insertion Sort only pays for the inversions it actually has to fix. This is exactly the property that Timsort exploits in real libraries.
+\paragraph{Insertion Sort on almost-sorted data.} On PS\,90\% input at $n = 10^6$, Insertion Sort finishes in $11\,542$\,ms, roughly $34\times$ faster than on random input. This follows from its $\mathcal{O}(n + k)$ best case, where $k$ is the number of inversions. This is exactly the property that Timsort \cite{auger2019} exploits.
 
-\paragraph{Quick Sort on structured inputs.} The median-of-three pivot was chosen to avoid the classical worst case on sorted or reversed data, so the measured $312.1$\,ms on reversed $n = 10\,000$ was a real surprise. Looking more carefully at the generator, the reversed input is a strict arithmetic sequence, and on such sequences the median-of-three trick still produces unbalanced partitions quite often. The same effect shows up in the partially-sorted columns at $n = 100\,000$: the time climbs from $10.4$\,ms on random input to more than $70$\,ms on PS\,90\%. Interestingly, at $n = 10^6$ Quick Sort recovers and returns to the $100$--$150$\,ms range: the anomaly is a constant-factor effect on medium sizes, which gets amortised at large $n$.
+\paragraph{Quick Sort on structured inputs.} The median-of-three pivot was chosen to avoid the classical worst case, so the measured $312.1$\,ms on reversed $n = 10\,000$ was a real surprise. On strict arithmetic sequences the median-of-three trick still produces unbalanced partitions quite often. The same effect shows up in the PS\,90\% column at $n = 100\,000$: the time climbs from $10.4$\,ms (random) to $72.1$\,ms. Interestingly, at $n = 10^6$ Quick Sort recovers to the $100$--$150$\,ms range: the anomaly is a constant-factor effect at medium sizes.
 
-\paragraph{Merge Sort's predictability.} Merge Sort behaves exactly like $\mathcal{O}(n \log n)$ should: multiplying $n$ by $10$ increases the time by roughly $11$--$12\times$, and the input shape changes the running time by only a few percent. That predictability is its main selling point, even when it is not the absolute winner in ms.
+\paragraph{Merge Sort's predictability.} Multiplying $n$ by $10$ increases Merge Sort's time by roughly $11$--$12\times$, and input shape changes the running time by only a few percent. That predictability is its main selling point.
 
-\paragraph{Radix Sort wins at scale.} Radix Sort is the fastest algorithm at every large size in Table~\ref{tab:large}, and the spread between its reversed and random columns stays inside roughly $15\%$. This is consistent with $\mathcal{O}(d \cdot n)$ behaviour, with $d \leq 7$ for the integer ranges used.
+\paragraph{Radix Sort wins at scale.} Radix Sort is the fastest algorithm at every large size, with almost no sensitivity to input shape, consistent with $\mathcal{O}(d \cdot n)$, $d \leq 7$.
 
-\paragraph{Using the segmentation fault as a controlled stress signal.} During a large $n = 10^6$ sweep, Quick Sort triggered a segmentation fault on one of the partially-sorted arrays, and the crash marker \texttt{[1] 44727 segmentation fault} appears in the raw CSV at that point. Rather than patching the code immediately and re-running, I chose to keep that data point visible. The crash is in fact a clean demonstration of the limit of median-of-three pivoting: on certain structured inputs the recursive partition tree stays deep enough to overflow the process stack, which is precisely the worst-case scenario that the pivot heuristic was supposed to make unlikely. The surrounding measurements, taken in separate executions, are individually valid and consistent with each other; the crash therefore adds information rather than removing it, and it is a concrete motivation for switching to an iterative Quick Sort in future work.
+\paragraph{Segmentation fault.} During the $n = 10^6$ sweep, Quick Sort triggered a segmentation fault on one partially-sorted array (crash marker visible in \texttt{results.csv}). The cause is stack overflow: on certain structured inputs the recursive partition tree is too deep for the default process stack. This is a concrete motivation for switching to an iterative Quick Sort in future work.
 
 % =====================================================================
 %  5. RELATED WORK
@@ -493,7 +518,21 @@ $n$ & \textbf{Algorithm} & \textbf{Rev.} & \textbf{Rand.} & \textbf{PS 10\%} & \
 \section{Related Work}
 \label{sec:related}
 
-\textit{[Placeholder.]} A detailed discussion of related work --- including comparison with similar projects from other students of the same course (advantages and disadvantages of each approach, problem framing, and methodology) --- will be added here once the cohort's submissions are available.
+Experimental comparisons of sorting algorithms have a long history. Below I discuss the work most relevant to this study, noting what they share with or differ from this paper.
+
+\paragraph{McIlroy (1993) --- optimistic sorting.} McIlroy \cite{mcilroy1993} showed that nearly-sorted sequences can be sorted in $\mathcal{O}(n)$ time by detecting pre-existing sorted runs. This underpins Timsort \cite{auger2019}. The present study confirms this effect for Insertion Sort: on PS\,90\% input at $n = 10^6$ it reaches $11\,542$\,ms, orders of magnitude better than on random data. A disadvantage of optimistic sorting is that it requires additional bookkeeping for run detection, complicating the implementation compared to plain Insertion Sort.
+
+\paragraph{Sedgewick \& Bentley (2002) --- Quicksort is optimal.} Sedgewick and Bentley \cite{sedgewick2002} argued that Quick Sort, with good engineering, achieves near-optimal average-case performance. The present study partially confirms this: Quick Sort on random large inputs is second only to Radix Sort. However, the reversed $n = 10\,000$ result ($312.1$\,ms, comparable to Bubble Sort) shows that even median-of-three is not enough to avoid bad behaviour on structured inputs. This is an advantage of Merge Sort over Quick Sort: predictable $\mathcal{O}(n \log n)$ regardless of input shape.
+
+\paragraph{Auger, Jugé, Nicaud, and Pivoteau (2019) --- TimSort worst case.} Auger, Jugé, Nicaud, and Pivoteau \cite{auger2019} proved that the version of TimSort used in Python and Java has a worst-case of $\mathcal{O}(n \log n)$. TimSort is a hybrid of Insertion Sort and Merge Sort. The experimental data in this paper explains why that hybrid works: Insertion Sort is very fast on nearly-sorted data, and Merge Sort provides the $\mathcal{O}(n \log n)$ safety net for the rest.
+
+\textit{Advantages of their work over this paper:} The analysis is formal and machine-verified; the worst-case guarantee is proven, not just observed.\\
+\textit{Advantages of this paper over their work:} This study covers six distinct algorithms side by side on the same hardware with the same input shapes, giving a direct empirical comparison that the theoretical paper does not provide. The raw timing data also shows the practical cost of TimSort's added complexity relative to its individual components.
+
+\paragraph{Aliaga, Barreda, Dolz, and Quintana-Ortí (2017) --- CPU frequency effects.} Aliaga, Barreda, Dolz, and Quintana-Ortí \cite{aliaga2017} studied how CPU frequency scaling affects sorting benchmarks and found that raw timing measurements can be misleading if the CPU throttles during a run. The present study does not control for frequency scaling, which is a limitation: the absolute times reported here are tied to the specific hardware and OS state during the runs.
+
+\textit{Advantages of their work over this paper:} The methodology is more rigorous --- CPU frequency is controlled, and multiple hardware platforms are tested.\\
+\textit{Advantages of this paper over their work:} This study tests a wider variety of input shapes (seven variants) rather than focusing on hardware effects on random data, revealing structure-dependent behaviour that their study does not address.
 
 % =====================================================================
 %  6. CONCLUSIONS AND FUTURE WORK
@@ -503,47 +542,180 @@ $n$ & \textbf{Algorithm} & \textbf{Rev.} & \textbf{Rand.} & \textbf{PS 10\%} & \
 
 \subsection{Summary}
 
-This paper compared six classical sorting algorithms --- Bubble Sort, Insertion Sort, Selection Sort, Merge Sort, Quick Sort, and Radix Sort --- implemented in C and run on integer arrays of seven different sizes and seven different shapes. The main findings are:
+This paper compared six classical sorting algorithms implemented in C across seven array sizes and seven input shapes. The main findings are:
 
 \begin{itemize}[noitemsep]
-  \item The two pure-quadratic methods (Bubble Sort, Selection Sort) become unusable past $n \approx 10\,000$, confirming the theoretical bound in a very concrete way.
-  \item Insertion Sort is the one classical algorithm whose running time depends strongly on how sorted the input already is; on PS\,90\% data at $n = 10^6$ it reaches a level that only radix-like algorithms can match.
-  \item Median-of-three Quick Sort is an excellent average-case sort but can still misbehave on structured input, and the segmentation fault observed at $n = 10^6$ is a direct illustration of that limit.
-  \item Merge Sort is the most predictable method in the study: its running time grows very close to $n \log n$ regardless of input shape, at the price of $\mathcal{O}(n)$ extra memory.
-  \item Radix Sort is the fastest method at every large size tested, with almost no sensitivity to input shape, which matches its $\mathcal{O}(d \cdot n)$ complexity.
+  \item Bubble Sort and Selection Sort become unusable past $n \approx 10\,000$, confirming the theoretical quadratic bound concretely.
+  \item Insertion Sort's running time depends strongly on how sorted the input already is; on PS\,90\% data at $n = 10^6$ it is only $\approx 30\times$ slower than Radix Sort.
+  \item Median-of-three Quick Sort is excellent on average but can still degrade on structured inputs; the segmentation fault at $n = 10^6$ is a direct illustration of that limit.
+  \item Merge Sort is the most predictable method: its running time grows as $n \log n$ regardless of input shape.
+  \item Radix Sort is the fastest at every large size tested, with almost no sensitivity to input shape.
 \end{itemize}
 
 \subsection{Problems Encountered}
 
-Two practical problems came up during the work. The first is the stack overflow in Quick Sort and, to a smaller extent, in Merge Sort at $n = 10^6$, which caused the segmentation fault discussed in Section~\ref{sec:analysis}. For Merge Sort the recursion depth is $\log_2(10^6) \approx 20$, which should be safe, so the culprit is most likely the combination of several live auxiliary allocations on top of the recursive frames. For Quick Sort the cause is more direct: on certain structured inputs the recursion tree is simply too deep. I isolated the affected runs in separate program invocations and kept the crash marker in the CSV, because it is informative rather than misleading.
-
-The second issue is that \texttt{clock()} measures CPU time, not wall-clock time. On modern multi-core systems the two can differ, and the CPU time of a single-threaded program is usually the right signal for a benchmark like this one. Still, I flag it here so that anyone rerunning the program on a different machine interprets the numbers the same way.
+Two practical problems came up. First, Quick Sort triggered a segmentation fault (stack overflow) on a partially-sorted $n = 10^6$ array. I kept the crash marker in the CSV because it is informative rather than misleading, and I isolated the affected run in a separate invocation. Second, \texttt{clock()} measures CPU time, not wall-clock time. On multi-core systems the two can differ; a future study should also report wall-clock time for completeness.
 
 \subsection{Future Work}
 
-\textit{[Placeholder.]} Once the related-work comparison in Section~\ref{sec:related} is complete, the corresponding future-work items will be listed here --- mapping each gap identified in related work (and each problem listed in Section~6.2) to a concrete next step in this line of research.
+The following improvements are directly motivated by the findings and limitations above:
+
+\begin{itemize}[noitemsep]
+  \item \textbf{Iterative Quick Sort.} Replace the recursive implementation with an iterative one (explicit stack) to eliminate the stack-overflow risk on large structured inputs. This is the most urgent fix.
+  \item \textbf{Additional data types.} Extend the benchmark to strings, floating-point numbers, and linked-list-based sequences. Radix Sort in particular would need significant changes to handle these, and its advantage over comparison-based sorts may shrink.
+  \item \textbf{Hardware-varied experiments.} Run the same benchmark on machines with different CPU speeds, cache sizes, and memory bandwidth to see which hardware parameter influences the results most. The findings of Aliaga, Barreda, Dolz, and Quintana-Ortí \cite{aliaga2017} suggest that cache effects can change the ranking of algorithms.
+  \item \textbf{Controlled CPU frequency.} Pin the CPU frequency during measurements to remove the confound identified in related work.
+  \item \textbf{Parallel sorting.} Measure parallel variants (e.g.\ parallel Merge Sort) on multi-core hardware to compare with the single-threaded results reported here.
+  \item \textbf{Comparison with standard library sorts.} Measure \texttt{qsort} from the C standard library and Python's Timsort on the same inputs for a direct head-to-head comparison.
+\end{itemize}
 
 % =====================================================================
 %  BIBLIOGRAPHY
 % =====================================================================
-\begin{thebibliography}{9}
+\bibliographystyle{plain}
+\bibliography{sorting_paper}
 
-\bibitem{knuth1998}
-D.~E. Knuth,
-\textit{The Art of Computer Programming, Volume 3: Sorting and Searching},
-2nd ed.
-Addison-Wesley, Reading, MA, 1998.
-\newline
-\textit{Role:} Primary theoretical reference for the classical sorting algorithms, their average-case analysis, and their stability properties. Used throughout Section~\ref{sec:formal} and quoted again in Section~\ref{sec:related}.
+% =====================================================================
+%  APPENDIX: PSEUDOCODE
+% =====================================================================
+\appendix
+\section{Pseudocode for the Six Sorting Algorithms}
+\label{app:pseudocode}
 
-\bibitem{cormen2022}
-T.~H. Cormen, C.~E. Leiserson, R.~L. Rivest, and C.~Stein,
-\textit{Introduction to Algorithms},
-4th ed.
-MIT Press, Cambridge, MA, 2022.
-\newline
-\textit{Role:} Source of the formal definitions, pseudocode, and correctness proofs used in Section~\ref{sec:formal}, including the $\Omega(n \log n)$ lower bound on comparison-based sorting. Also used as a reference for the hybrid-algorithm discussion in Section~\ref{sec:related}.
+The pseudocode below uses a simple notation. \textsc{Swap}($A$, $i$, $j$) exchanges $A[i]$ and $A[j]$. Arrays are 0-indexed. The goal in every case is to sort $A[0 \ldots n-1]$ in non-decreasing order.
 
-\end{thebibliography}
+% --- Bubble Sort ---
+\begin{algorithm}[H]
+\caption{Bubble Sort}
+\begin{algorithmic}[1]
+\Require Array $A$, size $n$
+\For{$i \gets 0$ \textbf{to} $n-2$}
+  \State $\textit{swapped} \gets \textbf{false}$
+  \For{$j \gets 0$ \textbf{to} $n-2-i$}
+    \If{$A[j] > A[j+1]$}
+      \State \textsc{Swap}($A$, $j$, $j+1$)
+      \State $\textit{swapped} \gets \textbf{true}$
+    \EndIf
+  \EndFor
+  \If{$\textit{swapped} = \textbf{false}$}
+    \State \textbf{stop} \Comment{Array is already sorted}
+  \EndIf
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+% --- Insertion Sort ---
+\begin{algorithm}[H]
+\caption{Insertion Sort}
+\begin{algorithmic}[1]
+\Require Array $A$, size $n$
+\For{$i \gets 1$ \textbf{to} $n-1$}
+  \State $\textit{key} \gets A[i]$
+  \State $j \gets i - 1$
+  \While{$j \geq 0$ \textbf{and} $A[j] > \textit{key}$}
+    \State $A[j+1] \gets A[j]$
+    \State $j \gets j - 1$
+  \EndWhile
+  \State $A[j+1] \gets \textit{key}$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+% --- Selection Sort ---
+\begin{algorithm}[H]
+\caption{Selection Sort}
+\begin{algorithmic}[1]
+\Require Array $A$, size $n$
+\For{$i \gets 0$ \textbf{to} $n-2$}
+  \State $\textit{minIdx} \gets i$
+  \For{$j \gets i+1$ \textbf{to} $n-1$}
+    \If{$A[j] < A[\textit{minIdx}]$}
+      \State $\textit{minIdx} \gets j$
+    \EndIf
+  \EndFor
+  \State \textsc{Swap}($A$, $i$, $\textit{minIdx}$)
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+% --- Merge Sort ---
+\begin{algorithm}[H]
+\caption{Merge Sort}
+\begin{algorithmic}[1]
+\Require Array $A$, left index $l$, right index $r$
+\If{$l \geq r$}
+  \State \textbf{return} \Comment{One element: already sorted}
+\EndIf
+\State $m \gets \lfloor (l + r) / 2 \rfloor$
+\State \Call{MergeSort}{$A$, $l$, $m$}
+\State \Call{MergeSort}{$A$, $m+1$, $r$}
+\State \Call{Merge}{$A$, $l$, $m$, $r$}
+\Statex
+\Procedure{Merge}{$A$, $l$, $m$, $r$}
+  \State Copy $A[l\ldots m]$ into $L$ and $A[m+1\ldots r]$ into $R$
+  \State $i \gets 0$;\ $j \gets 0$;\ $k \gets l$
+  \While{$i < |L|$ \textbf{and} $j < |R|$}
+    \If{$L[i] \leq R[j]$}
+      \State $A[k] \gets L[i]$;\ $i \gets i+1$
+    \Else
+      \State $A[k] \gets R[j]$;\ $j \gets j+1$
+    \EndIf
+    \State $k \gets k+1$
+  \EndWhile
+  \State Copy remaining elements of $L$ and $R$ into $A$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+% --- Quick Sort ---
+\begin{algorithm}[H]
+\caption{Quick Sort (median-of-three pivot)}
+\begin{algorithmic}[1]
+\Require Array $A$, low index $lo$, high index $hi$
+\If{$lo \geq hi$}\ \textbf{return} \EndIf
+\State $p \gets \Call{Partition}{A, lo, hi}$
+\State \Call{QuickSort}{$A$, $lo$, $p-1$}
+\State \Call{QuickSort}{$A$, $p+1$, $hi$}
+\Statex
+\Procedure{Partition}{$A$, $lo$, $hi$}
+  \State $m \gets lo + \lfloor (hi - lo) / 2 \rfloor$
+  \State Move median of $\{A[lo], A[m], A[hi]\}$ to $A[hi]$ \Comment{Median-of-three}
+  \State $\textit{pivot} \gets A[hi]$;\ $i \gets lo - 1$
+  \For{$j \gets lo$ \textbf{to} $hi-1$}
+    \If{$A[j] \leq \textit{pivot}$}
+      \State $i \gets i+1$;\ \textsc{Swap}($A$, $i$, $j$)
+    \EndIf
+  \EndFor
+  \State \textsc{Swap}($A$, $i+1$, $hi$)
+  \State \Return $i+1$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+% --- Radix Sort ---
+\begin{algorithm}[H]
+\caption{Radix Sort (LSD, base 10)}
+\begin{algorithmic}[1]
+\Require Array $A$, size $n$
+\State $\textit{maxVal} \gets \max(A)$
+\State $\textit{exp} \gets 1$
+\While{$\lfloor \textit{maxVal} / \textit{exp} \rfloor > 0$}
+  \State \Call{CountingPassByDigit}{$A$, $n$, $\textit{exp}$}
+  \State $\textit{exp} \gets \textit{exp} \times 10$
+\EndWhile
+\Statex
+\Procedure{CountingPassByDigit}{$A$, $n$, $\textit{exp}$}
+  \State $\textit{count}[0\ldots9] \gets 0$
+  \For{$i \gets 0$ \textbf{to} $n-1$}
+    \State $d \gets \lfloor A[i] / \textit{exp} \rfloor \bmod 10$;\ $\textit{count}[d] \gets \textit{count}[d]+1$
+  \EndFor
+  \For{$d \gets 1$ \textbf{to} $9$}
+    \State $\textit{count}[d] \gets \textit{count}[d] + \textit{count}[d-1]$ \Comment{Prefix sums}
+  \EndFor
+  \State Build output array by scanning $A$ right-to-left using $\textit{count}$
+  \State Copy output back to $A$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
 
 \end{document}

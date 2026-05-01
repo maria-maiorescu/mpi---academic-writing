@@ -1,5 +1,21 @@
+# Compiled binary
 algorithms
 tempCodeRunnerFile.c
+
+# LaTeX auxiliary / build output
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.synctex.gz
+*.toc
+missfont.log
+
+# Generated PDF (keep if you want to track it; comment out otherwise)
+# sorting_paper.pdf
+
+# OS / editor junk
 *.zip
 .DS_Store
-other/**
+.vscode/
