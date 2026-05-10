@@ -84,7 +84,8 @@
   \vspace{3cm}
 
   {\large\textbf{Maria Maiorescu}}\\[0.4cm]
-  {\small\href{mailto:maria.maiorescu06@e-uvt.ro}{maria.maiorescu06@e-uvt.ro}}
+  {\small\href{mailto:maria.maiorescu06@e-uvt.ro}{maria.maiorescu06@e-uvt.ro}}\\[0.2cm]
+   {\small\href{https://github.com/maria-maiorescu/mpi---academic-writing}{https://github.com/maria-maiorescu/mpi---academic-writing}}
 
   \vfill
 
@@ -120,8 +121,6 @@ The numbers confirm most of the theory, but they also show effects that pure com
 %  1. INTRODUCTION
 % =====================================================================
 \section{Introduction}
-
-\subsection{Motivation and Context}
 
 Sorting is everywhere --- inside database query plans, compilers, search engines, graphics pipelines, and almost every program that scans an ordered collection. Because it is so common, any improvement pays off many times. Sorting is also one of the most studied topics in algorithmics, from Knuth's classical treatment \cite{knuth1998} to modern work on cache-aware and parallel sorts.
 
@@ -161,8 +160,8 @@ Section~\ref{sec:formal} gives the formal definition and a short summary of each
 
 \subsection{The Sorting Problem}
 
-\begin{definition}[Sorting Problem]
-Let $A = \langle a_1, a_2, \ldots, a_n \rangle$ be a sequence of $n$ elements drawn from a totally ordered set $(S, \leq)$. A \emph{sorting algorithm} produces a permutation $A' = \langle a_{\pi(1)}, a_{\pi(2)}, \ldots, a_{\pi(n)} \rangle$ such that
+\begin{definition}[Sorting Problem - Knuth \cite{knuth1998}]
+Let $A = \langle a_1, a_2, \ldots, a_n \rangle$ be a sequence of $n$ elements drawn from a totally ordered set $(S, \leq)$. A \emph{sorting algorithm} produces a permutation $A' = \langle a_{\pi(1)}, a_{\pi(2)}, \ldots, a_{\pi(n)} \rangle$ such that 
 $$a_{\pi(1)} \leq a_{\pi(2)} \leq \cdots \leq a_{\pi(n)}.$$
 \end{definition}
 
@@ -170,7 +169,7 @@ For this study the elements are non-negative integers, so $S = \mathbb{N}$ and $
 
 \subsection{Algorithmic Complexity}
 
-Table~\ref{tab:complexity} collects the best, average, and worst-case time complexities, together with the extra memory each method needs. The numbers are standard results and can be found, with proofs, in Knuth \cite{knuth1998} and CLRS \cite{cormen2022}.
+Table~\ref{tab:complexity} collects the best, average, and worst-case time complexities, together with the extra memory each method needs. The numbers are standard results and can be found, with proofs, in Knuth \cite{knuth1998} and Cormen, Leiserson, Rivest, Stein \cite{cormen2022}.
 
 \begin{table}[H]
 \centering
@@ -233,11 +232,13 @@ Three input shapes are produced by dedicated functions:
 \subsection{LSD and MSD Radix Sort}
 
 \emph{LSD} (Least Significant Digit) radix sort processes the array digit by digit, starting from the rightmost (units) digit and working left towards the most significant digit. At each pass it applies a \emph{stable} counting sort on the current digit position: stability is essential because it preserves the relative order established by all previous passes. For example, sorting $\langle 170, 45, 75, 90, 802, 24, 2, 66 \rangle$ in base 10 proceeds as:
+\begin{quote}
 \begin{enumerate}[noitemsep,label=\textbf{Pass \arabic*}]
   \item Sort by units digit: $\langle 170, 90, 802, 2, 24, 45, 75, 66 \rangle$
   \item Sort by tens digit: $\langle 802, 2, 24, 45, 66, 170, 75, 90 \rangle$
   \item Sort by hundreds digit: $\langle 2, 24, 45, 66, 75, 90, 170, 802 \rangle$ \checkmark
 \end{enumerate}
+\end{quote}
 The contrast is \emph{MSD} (Most Significant Digit) radix sort, which starts from the left and recurses into sub-buckets per digit --- more complex to implement and harder to make stable. LSD is the standard choice when keys have a fixed maximum width, as is the case here ($d \leq 7$ for the array sizes tested).
 
 \subsection{Timing Methodology}
@@ -272,8 +273,10 @@ Delete \texttt{results.csv} before running to start from a clean file. Running t
 \label{sec:experiment}
 
 \subsection{Experimental Setup}
+All measurements were taken on a personal laptop running a Unix-like OS, compiled with optimization level 2: \texttt{gcc -O2}. 
+\paragraph{Array sizes:} $n \in \{10, 50, 100, 1\,000, 10\,000, 100\,000, 1\,000\,000\}$. 
+\paragraph{Input variants:} reversed, random, partially sorted at $10\%, 30\%, 50\%, 70\%, 90\%$.
 
-All measurements were taken on a personal laptop running a Unix-like OS, compiled with \texttt{gcc -O2}. Array sizes: $n \in \{10, 50, 100, 1\,000, 10\,000, 100\,000, 1\,000\,000\}$. Input variants: reversed, random, partially sorted at $10\%, 30\%, 50\%, 70\%, 90\%$.
 
 \subsection{Results: Small Arrays ($n \leq 100$)}
 
@@ -415,7 +418,7 @@ The four figures below show elapsed time versus array size on a logarithmic scal
 ]
 \addplot coordinates {(100,0.037)(1000,3.711)(10000,361.3)(100000,13228)(1000000,1318479)};
 \addlegendentry{Bubble Sort}
-\addplot coordinates {(100,0.036)(1000,3.215)(10000,312.1)(100000,12726)(1000000,114.6)};
+\addplot coordinates {(100,0.036)(1000,3.215)(10000,312.1)(100000,12726)(1000000,1146890)};
 \addlegendentry{Quick Sort}
 \addplot coordinates {(100,0.025)(1000,2.385)(10000,235.5)(100000,8343)(1000000,812518)};
 \addlegendentry{Insertion Sort}
@@ -431,7 +434,7 @@ The four figures below show elapsed time versus array size on a logarithmic scal
 \label{fig:reversed}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
 \begin{tikzpicture}
 \begin{axis}[
