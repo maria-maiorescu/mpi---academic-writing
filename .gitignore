@@ -21,3 +21,5 @@ missfont.log
 .vscode/
 
 review/*.pdf
+script.fdb_latexmk
+script.fls
