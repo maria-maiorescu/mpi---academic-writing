@@ -19,3 +19,5 @@ missfont.log
 *.zip
 .DS_Store
 .vscode/
+
+review/*.pdf

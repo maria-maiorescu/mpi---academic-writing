@@ -1,0 +1,25 @@
+Review of “Comparing Sorting Algorithms in Python”
+
+The paper is in the scope of the assignment. It studies sorting algorithms, their complexity, implementation, benchmarking, and experimental comparison, which match the requirements of the scientific paper assignment.
+
+This paper presents a practical comparison of several classical sorting algorithms implemented in Python. The work includes Bubble Sort, Selection Sort, Insertion Sort, Merge Sort, Quick Sort, Heap Sort, Shell Sort, and Python’s built-in sorting function. The project generates datasets, benchmarks the algorithms on different input types and sizes, checks correctness automatically, stores the timing results, and creates graphs for visualization. The paper combines theoretical complexity analysis with practical measurements and focuses on understanding how sorting algorithms behave in real executions.
+
+The presentation of the paper is clear enough for a fair evaluation of the objectives and results. The structure follows a logical academic organization, including introduction, formal problem description, implementation, experiments, related work, conclusions, and references. The explanations are easy to follow, and the language is simple and appropriate for a university assignment. The examples and figures help the reader understand the main ideas.
+
+The main results are reasonably important for the level of this assignment. The paper successfully demonstrates the practical difference between quadratic sorting algorithms and more efficient O(n log n) algorithms. It also shows how input structure influences performance and confirms the efficiency of Python’s built-in sorting implementation. The inclusion of graphs, heatmaps, and benchmark automation improves the quality of the experimental section.
+
+The results are reasonably non-trivial to achieve. The author implemented multiple algorithms, created a benchmarking framework, generated reusable datasets, automated correctness checking, and produced graphical analyses of the results. Organizing the project into separate modules for generation, benchmarking, analysis, and visualization also demonstrates good programming practice.
+
+The results seem to be original in the context of this assignment. The sorting algorithms themselves are classical and well known, but the project combines implementation, automated benchmarking, visualization, and comparison in a coherent Python-based study. The paper clearly cites the original literature and does not claim to invent new algorithms.
+
+The paper contains enough details to understand and partially verify the correctness of the work. The formal sections define the sorting problem properly, summarize complexity properties, and explain how correctness is checked during benchmarking. The implementation section also describes the workflow and project structure clearly enough for reproducibility.
+
+From a technical perspective, the author seems to understand the subject sufficiently well. The complexity discussions are mostly correct, and the interpretation of the benchmark results is consistent with standard algorithm theory. I have partially checked the technical explanations and did not notice major conceptual problems. 
+
+The presentation quality is generally good. The figures are relevant and support the discussion well, especially the runtime comparison graphs and the heatmap analysis. The bibliography is also appropriate and uses valid references from both textbooks and original papers. The paper is readable and organized consistently. However, there are a few small issues that could be improved. Some explanations repeat ideas already mentioned earlier, especially when discussing quadratic versus O(n log n) behaviour. A few paragraphs are also slightly longer than necessary and could be shortened for better readability.
+
+For improvement, I would suggest adding more precise experimental details, such as the hardware specifications and Python version used during testing. The benchmark could also include repeated runs with statistical measures such as standard deviation, as already mentioned in the future work section. Another improvement would be to include a short table with the actual measured values in addition to the graphs. Some algorithms could also be tested on identical maximum input sizes for easier direct comparison, even if only on smaller datasets. 
+
+Overall, this is a solid and well-structured university project. The author demonstrates a good understanding of sorting algorithms, benchmarking, and experimental comparison. The implementation is organized clearly, the experiments are meaningful, and the paper successfully connects theoretical concepts with practical execution results. While there are some areas where the analysis could be deeper, the work is technically sound and appropriate for the assignment requirements.
+
+Final recommendation: Weak Accept.

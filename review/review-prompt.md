@@ -1,6 +1,6 @@
 # Scientific paper review rules
 1. Read abstract, introduction and conclusion 
-2. if the paper is in the scope (use #scientificPaper.md and system_prompt.md to understand the overall scope of the assignment)
+2. if the paper is in the scope (use #scientificPaper.md  to understand the overall scope of the assignment and the instructions from the professor)
     - then report "the paper is in the scope", go to #3
     - else describe the topic of the paper, report "reject because the paper is not in the scope" - STOP
 3. read the main parts of the paper, write a short summary of the paper: problem, main results
