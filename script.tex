@@ -1,0 +1,400 @@
+\documentclass[12pt]{article}
+
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{setspace}
+
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+\titleformat{\section}
+{\large\bfseries}
+{}
+{0pt}
+{}
+
+\begin{document}
+
+\begin{center}
+    {\LARGE \textbf{Presentation Delivery Script}}\\[0.4cm]
+
+    {\large Experimental Analysis of Sorting Algorithms}\\[0.2cm]
+
+    Maria Maiorescu\\
+    West University of Timișoara\\
+    \today
+\end{center}
+
+\vspace{0.8cm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Slide 1 --- Title and Introduction}
+
+\textbf{Time:} 30 seconds
+
+\textbf{Support Material:}
+\begin{itemize}[leftmargin=0.7cm]
+    \item Presentation title
+    \item Author name
+    \item University
+\end{itemize}
+
+\textbf{Method of Presentation:}
+
+Short oral introduction.
+
+\textbf{What I Say:}
+
+Today I will present my research paper called
+\emph{Experimental Analysis of Sorting Algorithms}.
+
+The goal of this project was to compare six classical
+sorting algorithms using different array sizes
+and different types of input data.
+
+The paper combines theoretical analysis
+with practical benchmarking implemented in C.
+
+\textbf{Organizational Remarks:}
+
+Introduce the topic and move to the next slide.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Slide 2 --- Importance of Sorting}
+
+\textbf{Time:} 30 seconds
+
+\textbf{Support Material:}
+\begin{itemize}[leftmargin=0.7cm]
+    \item Examples:
+    \begin{itemize}
+        \item databases
+        \item search engines
+        \item operating systems
+    \end{itemize}
+\end{itemize}
+
+\textbf{Method of Presentation:}
+
+Explanation with simple examples.
+
+\textbf{What I Say:}
+
+Sorting is one of the most important problems
+in computer science.
+
+It appears in databases, search engines,
+operating systems, and many other applications.
+
+Although textbooks focus mainly on theoretical complexity,
+real performance also depends on factors such as
+input structure and implementation details.
+
+Because of this, practical benchmarking is important
+in addition to theoretical analysis.
+
+\textbf{Organizational Remarks:}
+
+Maintain eye contact and avoid reading directly from the slide.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Slide 3 --- Related Work}
+
+\textbf{Time:} 20 seconds
+
+\textbf{Support Material:}
+\begin{itemize}[leftmargin=0.7cm]
+    \item Knuth
+    \item Cormen, Leiserson, Rivest, Stein
+    \item TimSort
+\end{itemize}
+
+\textbf{Method of Presentation:}
+
+Short overview of related studies and images
+
+\textbf{What I Say:}
+
+This project was inspired by several important studies
+about sorting algorithms.
+
+Knuth and the Cormen, Leiserson, Rivest, Stein textbooks provide the theoretical background,
+while more recent studies focus on adaptive sorting methods
+such as TimSort.
+
+My project compares six algorithms
+using the same hardware and the same testing conditions.
+
+\textbf{Organizational Remarks:}
+
+Keep this section short.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Slide 4 --- Algorithms Used}
+
+\textbf{Time:} 1.5 minutes
+
+\textbf{Support Material:}
+\begin{itemize}[leftmargin=0.7cm]
+    \item Complexity table
+    \item Names of algorithms
+\end{itemize}
+
+\textbf{Method of Presentation:}
+
+Technical explanation.
+
+\textbf{What I Say:}
+
+In this project, I tested six classical sorting algorithms:
+Bubble Sort, Insertion Sort, Selection Sort,
+Merge Sort, Quick Sort, and Radix Sort.
+
+Bubble Sort, Insertion Sort, and Selection Sort
+become slow when the input size grows.
+
+Merge Sort and Quick Sort perform much better
+on large arrays.
+
+I also included Radix Sort,
+which was the fastest algorithm
+in most large tests.
+
+\textbf{Organizational Remarks:}
+
+Point briefly at the complexity table.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Slide 5 --- Benchmark Methodology}
+
+\textbf{Time:} 2 minutes
+
+\textbf{Support Material:}
+\begin{itemize}[leftmargin=0.7cm]
+    \item Benchmark structure
+    \item Input variants
+    \item Timing method
+\end{itemize}
+
+\textbf{Method of Presentation:}
+
+Step-by-step explanation.
+
+\textbf{What I Say:}
+
+The benchmarking system was implemented entirely in C.
+
+The program contains:
+data generation,
+sorting functions,
+timing functions,
+and benchmarking code.
+
+I tested random arrays,
+reversed arrays,
+and partially sorted arrays.
+
+The execution time was measured using the \texttt{clock()} function.
+
+For small arrays,
+the timings were averaged over many runs
+to reduce noise.
+
+\textbf{Organizational Remarks:}
+
+Slow down slightly because this slide contains technical details.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Slide 6 --- Experimental Setup}
+
+\textbf{Time:} 45 seconds
+
+\textbf{Support Material:}
+\begin{itemize}[leftmargin=0.7cm]
+    \item Array sizes
+    \item GCC compiler
+    \item Optimization level
+\end{itemize}
+
+\textbf{Method of Presentation:}
+
+Short technical overview.
+
+\textbf{What I Say:}
+
+The experiments were executed on a personal laptop
+using GCC with optimization level O2.
+
+The tested array sizes ranged from
+10 elements up to one million elements.
+
+Each algorithm was tested on different input types
+to observe how scalability and input structure
+influence performance.
+
+\textbf{Organizational Remarks:}
+
+Transition toward the results section.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Slide 7 --- Results for Small and Medium Arrays}
+
+\textbf{Time:} 1 minute
+
+\textbf{Support Material:}
+\begin{itemize}[leftmargin=0.7cm]
+    \item Tables
+    \item Small graphs
+\end{itemize}
+
+\textbf{Method of Presentation:}
+
+Comparative analysis.
+
+\textbf{What I Say:}
+
+For small arrays,
+the differences between algorithms are smaller.
+
+However,
+Radix Sort and Merge Sort already perform very well.
+
+Insertion Sort also becomes surprisingly efficient
+when the input is almost sorted.
+
+For medium arrays,
+the quadratic algorithms start becoming much slower,
+while Merge Sort, Quick Sort,
+and Radix Sort scale much better.
+
+\textbf{Organizational Remarks:}
+
+Focus on trends instead of exact numbers.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Slide 8 --- Results for Large Arrays}
+
+\textbf{Time:} 1 minute 20 seconds
+
+\textbf{Support Material:}
+\begin{itemize}[leftmargin=0.7cm]
+    \item Large graphs
+    \item Logarithmic plots
+\end{itemize}
+
+\textbf{Method of Presentation:}
+
+Graph interpretation.
+
+\textbf{What I Say:}
+
+For large arrays,
+the differences become very large.
+
+Bubble Sort and Selection Sort
+become impractical because of their quadratic complexity.
+
+Merge Sort remains stable and predictable,
+while Radix Sort becomes the fastest algorithm
+for large inputs.
+
+Quick Sort performs very well on random data,
+but some structured inputs still produce slowdowns.
+
+The logarithmic graphs clearly show
+the difference between quadratic growth
+and more efficient algorithms.
+
+\textbf{Organizational Remarks:}
+
+Briefly explain how to read the graph axes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Slide 9 --- Analysis and Problems Encountered}
+
+\textbf{Time:} 2 minutes
+
+\textbf{Support Material:}
+\begin{itemize}[leftmargin=0.7cm]
+    \item Key findings
+    \item Quick Sort behaviour
+\end{itemize}
+
+\textbf{Method of Presentation:}
+
+Discussion of important observations.
+
+\textbf{What I Say:}
+
+One interesting result was that
+Insertion Sort became much faster
+when the input was almost sorted.
+
+Another important observation
+was the behaviour of Quick Sort
+on structured inputs.
+
+At first, Quick Sort caused a stack overflow because the pivot selection produced very deep recursion. After changing the implementation to a median-of-three pivot, the algorithm became much more stable.
+
+This shows that practical implementations
+can behave differently from theoretical expectations.
+
+\textbf{Organizational Remarks:}
+
+Point at the results.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Slide 10 --- Conclusion and Future Work}
+
+\textbf{Time:} 1 minute
+
+\textbf{Support Material:}
+\begin{itemize}[leftmargin=0.7cm]
+    \item Summary bullets
+    \item Future improvements
+\end{itemize}
+
+\textbf{Method of Presentation:}
+
+Final summary.
+
+\textbf{What I Say:}
+
+In conclusion,
+this project compared six classical sorting algorithms
+using different array sizes and input types.
+
+Bubble Sort and Selection Sort
+became very slow on large inputs,
+while Merge Sort and Radix Sort
+remained efficient.
+
+The experiments also showed that
+input structure strongly influences
+algorithms such as Insertion Sort and Quick Sort.
+
+For future work,
+I would like to test more data types
+and compare these algorithms
+with standard library sorting functions.
+
+Thank you for your attention!
+
+\textbf{Organizational Remarks:}
+
+End the presentation clearly.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
