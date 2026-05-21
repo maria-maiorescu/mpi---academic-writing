@@ -2,401 +2,213 @@
 
 \usepackage[a4paper,margin=2.5cm]{geometry}
 \usepackage{enumitem}
-\usepackage{titlesec}
-\usepackage{setspace}
 
-\setlength{\parskip}{0.5em}
-\setlength{\parindent}{0pt}
-
-\titleformat{\section}
-{\large\bfseries}
-{}
-{0pt}
-{}
+\title{Presentation Delivery Plan\\
+\large Experimental Analysis of Sorting Algorithms}
+\author{Maria Maiorescu}
+\date{\today}
 
 \begin{document}
 
-\begin{center}
-    {\LARGE \textbf{Presentation Delivery Script}}\\[0.4cm]
+\maketitle
 
-    {\large Experimental Analysis of Sorting Algorithms}\\[0.2cm]
+\section*{Audience Analysis}
 
-    Maria Maiorescu\\
-    West University of Timișoara\\
-    \today
-\end{center}
-
-\vspace{0.8cm}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section*{Slide 1 --- Title and Introduction}
-
-\textbf{Time:} 30 seconds
-
-\textbf{Support Material:}
+The presentation is addressed to:
 \begin{itemize}[leftmargin=0.7cm]
-    \item Presentation title
-    \item Author name
-    \item University
+    \item university students,
+    \item highschool students,
+    \item software developers,
+    \item professors from computer science.
 \end{itemize}
 
-\textbf{Method of Presentation:}
+The presentation focuses mainly on practical benchmarking and experimental behaviour.
 
-Short oral introduction.
+\vspace{0.4cm}
+
+\section*{Presentation Structure}
+
+\subsection*{Slide 1 -- Title and Introduction}
+
+\textbf{Time:} 30 seconds\\
+\textbf{Presentation Phase:} Motivation\\
+\textbf{Operational Goal:} Introduce the topic and research objective.\\
+\textbf{Presentation Method:} Short oral introduction.\\
 
 \textbf{What I Say:}
 
-Today I will present my research paper called
-\emph{Experimental Analysis of Sorting Algorithms}.
+Today I will present my research paper called \textit{Experimental Analysis of Sorting Algorithms}.
 
-The goal of this project was to compare six classical
-sorting algorithms using different array sizes
-and different types of input data.
+The goal of this project was to compare six classical sorting algorithms using different array sizes and input structures.
 
-The paper combines theoretical analysis
-with practical benchmarking implemented in C.
+The project combines theoretical complexity analysis with practical benchmarking implemented in C.
 
-Also, the implementation is available on GitHub (add a QR code). 
+\vspace{0.4cm}
 
-\textbf{Organizational Remarks:}
+\subsection*{Slide 2 -- Importance of Sorting}
 
-Introduce the topic and move to the next slide.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section*{Slide 2 --- Importance of Sorting}
-
-\textbf{Time:} 30 seconds
-
-\textbf{Support Material:}
-\begin{itemize}[leftmargin=0.7cm]
-    \item Examples:
-    \begin{itemize}
-        \item databases
-        \item search engines
-        \item operating systems
-    \end{itemize}
-\end{itemize}
-
-\textbf{Method of Presentation:}
-
-Explanation with simple examples.
+\textbf{Time:} 40 seconds\\
+\textbf{Presentation Phase:} Motivation\\
+\textbf{Operational Goal:} Explain why sorting algorithms are important.\\
+\textbf{Presentation Method:} Explanation with examples.\\
 
 \textbf{What I Say:}
 
-Sorting is one of the most important problems
-in computer science.
+Sorting algorithms are fundamental in computer science and appear in databases, search engines, and operating systems.
 
-It appears in databases, search engines,
-operating systems, and many other applications.
+Although theory focuses mainly on asymptotic complexity, practical performance also depends on implementation details and input structure.
 
-Although textbooks focus mainly on theoretical complexity,
-real performance also depends on factors such as
-input structure and implementation details.
+Because of this, practical benchmarking is important in addition to theoretical analysis.
 
-Because of this, practical benchmarking is important
-in addition to theoretical analysis.
+\vspace{0.4cm}
 
-\textbf{Organizational Remarks:}
+\subsection*{Slide 3 -- Related Work}
 
-Maintain eye contact and avoid reading directly from the slide.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section*{Slide 3 --- Related Work}
-
-\textbf{Time:} 20 seconds
-
-\textbf{Support Material:}
-\begin{itemize}[leftmargin=0.7cm]
-    \item Knuth
-    \item Cormen, Leiserson, Rivest, Stein
-    \item TimSort
-\end{itemize}
-
-\textbf{Method of Presentation:}
-
-Short overview of related studies and images
+\textbf{Time:} 40 seconds\\
+\textbf{Presentation Phase:} Association\\
+\textbf{Operational Goal:} Connect the project with previous studies.\\
+\textbf{Presentation Method:} Short overview.\\
 
 \textbf{What I Say:}
 
-This project was inspired by several important studies
-about sorting algorithms.
+This project was inspired by classical studies from Knuth and Cormen, as well as more recent work related to TimSort and adaptive sorting.
 
-Knuth and the Cormen, Leiserson, Rivest, Stein textbooks provide the theoretical background,
-while more recent studies focus on adaptive sorting methods
-such as TimSort.
+Unlike many previous studies, this project compares six algorithms using identical testing conditions and multiple input structures.
 
-My project compares six algorithms
-using the same hardware and the same testing conditions.
+\vspace{0.4cm}
 
-\textbf{Organizational Remarks:}
+\subsection*{Slide 4 -- Algorithms Used}
 
-Keep this section short.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section*{Slide 4 --- Algorithms Used}
-
-\textbf{Time:} 1.5 minutes
-
-\textbf{Support Material:}
-\begin{itemize}[leftmargin=0.7cm]
-    \item Complexity table
-    \item Names of algorithms
-\end{itemize}
-
-\textbf{Method of Presentation:}
-
-Technical explanation.
+\textbf{Time:} 1 minute\\
+\textbf{Presentation Phase:} Learning\\
+\textbf{Operational Goal:} Present the tested algorithms.\\
+\textbf{Presentation Method:} Technical explanation.\\
 
 \textbf{What I Say:}
 
-In this project, I tested six classical sorting algorithms:
-Bubble Sort, Insertion Sort, Selection Sort,
-Merge Sort, Quick Sort, and Radix Sort.
+The project compares Bubble Sort, Insertion Sort, Selection Sort, Merge Sort, Quick Sort, and Radix Sort.
 
-Bubble Sort, Insertion Sort, and Selection Sort
-become slow when the input size grows.
+The quadratic algorithms become inefficient on large arrays, while Merge Sort and Quick Sort scale much better.
 
-Merge Sort and Quick Sort perform much better
-on large arrays.
+Radix Sort achieved the fastest performance in most large tests.
 
-I also included Radix Sort,
-which was the fastest algorithm
-in most large tests.
+\vspace{0.4cm}
 
-\textbf{Organizational Remarks:}
+\subsection*{Slide 5 -- Benchmark Methodology}
 
-Point briefly at the complexity table.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section*{Slide 5 --- Benchmark Methodology}
-
-\textbf{Time:} 2 minutes
-
-\textbf{Support Material:}
-\begin{itemize}[leftmargin=0.7cm]
-    \item Benchmark structure
-    \item Input variants
-    \item Timing method
-\end{itemize}
-
-\textbf{Method of Presentation:}
-
-Step-by-step explanation.
+\textbf{Time:} 1 minute 20 seconds\\
+\textbf{Presentation Phase:} Learning\\
+\textbf{Operational Goal:} Explain the benchmarking system.\\
+\textbf{Presentation Method:} Step-by-step explanation.\\
 
 \textbf{What I Say:}
 
-The benchmarking system was implemented entirely in C.
+The benchmarking framework was implemented entirely in C.
 
-The program contains:
-data generation,
-sorting functions,
-timing functions,
-and benchmarking code.
+I tested random arrays, reversed arrays, and partially sorted arrays.
 
-I tested random arrays,
-reversed arrays,
-and partially sorted arrays.
+Execution time was measured using the \texttt{clock()} function, and small-array tests were averaged over multiple runs to reduce noise.
 
-The execution time was measured using the \texttt{clock()} function.
+\vspace{0.4cm}
 
-For small arrays,
-the timings were averaged over many runs
-to reduce noise.
+\subsection*{Slide 6 -- Experimental Setup}
 
-\textbf{Organizational Remarks:}
-
-Slow down slightly because this slide contains technical details.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section*{Slide 6 --- Experimental Setup}
-
-\textbf{Time:} 45 seconds
-
-\textbf{Support Material:}
-\begin{itemize}[leftmargin=0.7cm]
-    \item Array sizes
-    \item GCC compiler
-    \item Optimization level
-\end{itemize}
-
-\textbf{Method of Presentation:}
-
-Short technical overview.
+\textbf{Time:} 45 seconds\\
+\textbf{Presentation Phase:} Learning\\
+\textbf{Operational Goal:} Present the testing environment.\\
+\textbf{Presentation Method:} Technical overview.\\
 
 \textbf{What I Say:}
 
-The experiments were executed on a personal laptop
-using GCC with optimization level O2.
+The experiments were executed using GCC with optimization level O2.
 
-The tested array sizes ranged from
-10 elements up to one million elements.
+The tested array sizes ranged from 10 elements up to one million elements.
 
-Each algorithm was tested on different input types
-to observe how scalability and input structure
-influence performance.
+Different input structures were used to observe how performance changes as the input size grows.
 
-\textbf{Organizational Remarks:}
+\vspace{0.4cm}
 
-Transition toward the results section.
+\subsection*{Slide 7 -- Results for Small and Medium Arrays}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section*{Slide 7 --- Results for Small and Medium Arrays}
-
-\textbf{Time:} 1 minute
-
-\textbf{Support Material:}
-\begin{itemize}[leftmargin=0.7cm]
-    \item Tables
-    \item Small graphs
-\end{itemize}
-
-\textbf{Method of Presentation:}
-
-Comparative analysis.
+\textbf{Time:} 1 minute\\
+\textbf{Presentation Phase:} Learning\\
+\textbf{Operational Goal:} Interpret the behaviour of algorithms at smaller scales.\\
+\textbf{Presentation Method:} Comparative analysis.\\
+\textbf{Presentation Support:} Results table and chart.\\
 
 \textbf{What I Say:}
 
-For small arrays,
-the differences between algorithms are smaller.
+For small arrays, the performance differences between algorithms are relatively small.
 
-However,
-Radix Sort and Merge Sort already perform very well.
+However, Radix Sort and Merge Sort already perform very efficiently even at medium sizes.
 
-Insertion Sort also becomes surprisingly efficient
-when the input is almost sorted.
+Insertion Sort also becomes surprisingly competitive when the input is almost sorted.
 
-For medium arrays,
-the quadratic algorithms start becoming much slower,
-while Merge Sort, Quick Sort,
-and Radix Sort scale much better.
+As the input size grows, the quadratic algorithms begin to slow down significantly.
 
-\textbf{Organizational Remarks:}
+\vspace{0.4cm}
 
-Focus on trends instead of exact numbers.
+\subsection*{Slide 8 -- Results for Large Arrays}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section*{Slide 8 --- Results for Large Arrays}
-
-\textbf{Time:} 1 minute 20 seconds
-
-\textbf{Support Material:}
-\begin{itemize}[leftmargin=0.7cm]
-    \item Large graphs
-    \item Logarithmic plots
-\end{itemize}
-
-\textbf{Method of Presentation:}
-
-Graph interpretation.
+\textbf{Time:} 1 minute 20 seconds\\
+\textbf{Presentation Phase:} Learning\\
+\textbf{Operational Goal:} Explain performance differences on large datasets.\\
+\textbf{Presentation Method:} Comparative analysis.\\
+\textbf{Presentation Support:} Results table and chart.\\
 
 \textbf{What I Say:}
 
-For large arrays,
-the differences become very large.
+For large arrays, the differences become extremely large.
 
-Bubble Sort and Selection Sort
-become impractical because of their quadratic complexity.
+Bubble Sort and Selection Sort become impractical because of their quadratic complexity.
 
-Merge Sort remains stable and predictable,
-while Radix Sort becomes the fastest algorithm
-for large inputs.
+Merge Sort remains stable and predictable, while Radix Sort becomes the fastest algorithm for large datasets.
 
-Quick Sort performs very well on random data,
-but some structured inputs still produce slowdowns.
+Quick Sort performs very efficiently on random data, but some structured inputs still produce slowdowns.
 
-The logarithmic graphs clearly show
-the difference between quadratic growth
-and more efficient algorithms.
+\vspace{0.4cm}
 
-\textbf{Organizational Remarks:}
+\subsection*{Slide 9 -- Analysis and Problems Encountered}
 
-Briefly explain how to read the graph axes.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section*{Slide 9 --- Analysis and Problems Encountered}
-
-\textbf{Time:} 2 minutes
-
-\textbf{Support Material:}
-\begin{itemize}[leftmargin=0.7cm]
-    \item Key findings
-    \item Quick Sort behaviour
-\end{itemize}
-
-\textbf{Method of Presentation:}
-
-Discussion of important observations.
+\textbf{Time:} 1 minute 20 seconds\\
+\textbf{Presentation Phase:} Association\\
+\textbf{Operational Goal:} Discuss important practical observations.\\
+\textbf{Presentation Method:} Discussion.\\
 
 \textbf{What I Say:}
 
-One interesting result was that
-Insertion Sort became much faster
-when the input was almost sorted.
+One important observation was the behaviour of Insertion Sort on nearly sorted input, where it became significantly faster.
 
-Another important observation
-was the behaviour of Quick Sort
-on structured inputs.
+Another important result involved Quick Sort on structured inputs.
 
-At first, Quick Sort caused a stack overflow because the pivot selection produced very deep recursion. After changing the implementation to a median-of-three pivot, the algorithm became much more stable.
+Initially, the recursive implementation caused a stack overflow because of deep recursion.
 
-This shows that practical implementations
-can behave differently from theoretical expectations.
+After introducing a median-of-three pivot strategy, the algorithm became much more stable.
 
-\textbf{Organizational Remarks:}
+This shows that practical implementations may behave differently from theoretical expectations.
 
-Point at the results.
+\vspace{0.4cm}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection*{Slide 10 -- Conclusion and Future Work}
 
-\section*{Slide 10 --- Conclusion and Future Work}
-
-\textbf{Time:} 1 minute
-
-\textbf{Support Material:}
-\begin{itemize}[leftmargin=0.7cm]
-    \item Summary bullets
-    \item Future improvements
-\end{itemize}
-
-\textbf{Method of Presentation:}
-
-Final summary.
+\textbf{Time:} 1 minute\\
+\textbf{Presentation Phase:} Conclusion\\
+\textbf{Operational Goal:} Summarize the study and future directions.\\
+\textbf{Presentation Method:} Final summary.\\
 
 \textbf{What I Say:}
 
-In conclusion,
-this project compared six classical sorting algorithms
-using different array sizes and input types.
+In conclusion, this project compared six classical sorting algorithms across multiple array sizes and input structures.
 
-Bubble Sort and Selection Sort
-became very slow on large inputs,
-while Merge Sort and Radix Sort
-remained efficient.
+The experiments confirmed the limitations of quadratic algorithms and highlighted the efficiency of Merge Sort and Radix Sort.
 
-The experiments also showed that
-input structure strongly influences
-algorithms such as Insertion Sort and Quick Sort.
+For future work, I would like to test additional data types and compare these algorithms with standard library implementations.
 
-For future work,
-I would like to test more data types
-and compare these algorithms
-with standard library sorting functions.
+\vspace{0.5cm}
 
 Thank you for your attention!
 
-\textbf{Organizational Remarks:}
 
-End the presentation clearly.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \end{document}
+
