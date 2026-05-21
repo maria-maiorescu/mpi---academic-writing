@@ -1,0 +1,463 @@
+% =====================================================================
+%  Beamer Presentation — 10 slides following script.tex exactly
+%  Experimental Analysis of Sorting Algorithms
+%  Maria Maiorescu -- West University of Timișoara
+%  Compile: pdflatex presentation.tex  (run twice)
+% =====================================================================
+\documentclass[aspectratio=169]{beamer}
+
+% --- Theme ---
+\usetheme{Madrid}
+\usecolortheme{whale}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.33\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+      \usebeamerfont{author in head/foot}Maria Maiorescu
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.34\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+      \usebeamerfont{title in head/foot}Experimental Analysis of Sorting Algorithms
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.33\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+      \usebeamerfont{date in head/foot}\insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+    \end{beamercolorbox}}%
+  \vskip0pt%
+}
+
+% --- Packages ---
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{array}
+\usepackage{microtype}
+
+% --- pgfplots cycle list: distinct colours + markers (B&W friendly) ---
+\pgfplotscreateplotcyclelist{colormarkers}{%
+  {blue!70!black,      mark=*,         thick},
+  {red!70!black,       mark=square*,   thick},
+  {green!50!black,     mark=triangle*, thick},
+  {orange!80!black,    mark=diamond*,  thick},
+  {violet,             mark=pentagon*, thick},
+  {cyan!60!black,      mark=oplus*,    thick}%
+}
+
+% --- Metadata ---
+\title[Sorting Algorithms]{Experimental Analysis of Sorting Algorithms}
+\subtitle{An Empirical Study Across Sizes and Input Shapes}
+\author{Maria Maiorescu}
+\institute[UVT]{%
+  Faculty of Informatics\\
+  West University of Timi\c{s}oara
+}
+\date{\today}
+
+% =====================================================================
+\begin{document}
+
+% =====================================================================
+%  SLIDE 1 -- TITLE AND INTRODUCTION
+% =====================================================================
+\begin{frame}
+  \titlepage
+  \vspace{-0.5em}
+  \begin{center}
+    \small
+    Goal: compare six classical sorting algorithms using different array sizes
+    and input structures, combining theoretical complexity analysis with practical
+    benchmarking implemented in~C.
+  \end{center}
+\end{frame}
+
+% =====================================================================
+%  SLIDE 2 -- IMPORTANCE OF SORTING
+% =====================================================================
+\begin{frame}{Importance of Sorting}
+  \begin{columns}[T]
+    \begin{column}{0.50\textwidth}
+      \textbf{Sorting is fundamental in computer science:}
+      \begin{itemize}
+        \item Databases
+        \item Search engines
+        \item Operating systems
+      \end{itemize}
+      \vspace{0.7em}
+      Theory focuses on asymptotic complexity, but practical performance also
+      depends on \textbf{implementation details} and \textbf{input structure}.
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \begin{alertblock}{Why benchmarking matters}
+        Asymptotic bounds hide constants, cache effects, and the shape of real
+        data.  An algorithm that wins on paper may lose on real input.
+      \end{alertblock}
+      \vspace{0.5em}
+      \begin{block}{Consequence}
+        Practical benchmarking is \emph{essential} alongside theoretical analysis.
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =====================================================================
+%  SLIDE 3 -- RELATED WORK
+% =====================================================================
+\begin{frame}{Related Work}
+  \begin{itemize}
+    \item \textbf{Donald E. Knuth (1998)} --- \textit{The Art of Computer Programming, Vol.~3}:
+          foundational reference for sorting theory and complexity proofs.
+
+    \vspace{0.4em}
+    \item \textbf{Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest,\\
+          Clifford Stein (2022)} --- \textit{Introduction to Algorithms (CLRS)}:
+          standard source for algorithm design and the $\Omega(n \log n)$ lower bound.
+
+    \vspace{0.4em}
+    \item \textbf{Nicolas Auger, Vincent Jug\'e, Cyril Nicaud, Carine Pivoteau (2019)}
+          --- proved TimSort runs in $\mathcal{O}(n \log n)$ worst case; TimSort exploits
+          adaptive behaviour of Insertion Sort on nearly-sorted data.
+
+    \vspace{0.4em}
+    \item \textbf{Robert Sedgewick \& Jon Bentley (2002)} --- argued that well-engineered
+          Quick Sort achieves near-optimal average performance.
+  \end{itemize}
+
+  \vspace{0.5em}
+  \begin{block}{What makes this project different}
+    Unlike many previous studies, this project compares \textbf{six algorithms} under
+    \textbf{identical testing conditions} and \textbf{multiple input structures}.
+  \end{block}
+\end{frame}
+
+% =====================================================================
+%  SLIDE 4 -- ALGORITHMS USED
+% =====================================================================
+\begin{frame}{Algorithms Used}
+  \begin{columns}[T]
+    \begin{column}{0.46\textwidth}
+      \begin{itemize}
+        \item \textbf{Bubble Sort} -- $\mathcal{O}(n^2)$, early-exit flag
+        \item \textbf{Insertion Sort} -- $\mathcal{O}(n^2)$; drops to $\mathcal{O}(n)$
+              on nearly-sorted input
+        \item \textbf{Selection Sort} -- $\mathcal{O}(n^2)$, always
+        \item \textbf{Merge Sort} -- $\mathcal{O}(n \log n)$, guaranteed
+        \item \textbf{Quick Sort} -- $\mathcal{O}(n \log n)$ average;
+              median-of-three pivot
+        \item \textbf{Radix Sort (LSD)} -- $\mathcal{O}(d \cdot n)$,
+              bypasses the comparison lower bound
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.52\textwidth}
+      \centering
+      \footnotesize
+      \setlength{\tabcolsep}{3pt}
+      \begin{tabular}{lcccc}
+        \toprule
+        \textbf{Algorithm} & \textbf{Best} & \textbf{Avg} & \textbf{Worst} & \textbf{Space} \\
+        \midrule
+        Bubble       & $\mathcal{O}(n)$       & $\mathcal{O}(n^2)$      & $\mathcal{O}(n^2)$      & $\mathcal{O}(1)$ \\
+        Insertion    & $\mathcal{O}(n)$       & $\mathcal{O}(n^2)$      & $\mathcal{O}(n^2)$      & $\mathcal{O}(1)$ \\
+        Selection    & $\mathcal{O}(n^2)$     & $\mathcal{O}(n^2)$      & $\mathcal{O}(n^2)$      & $\mathcal{O}(1)$ \\
+        Merge        & $\mathcal{O}(n\lg n)$  & $\mathcal{O}(n \lg n)$  & $\mathcal{O}(n \lg n)$  & $\mathcal{O}(n)$ \\
+        Quick        & $\mathcal{O}(n\lg n)$  & $\mathcal{O}(n \lg n)$  & $\mathcal{O}(n^2)$      & $\mathcal{O}(\lg n)$ \\
+        Radix (LSD)  & $\mathcal{O}(dn)$      & $\mathcal{O}(dn)$       & $\mathcal{O}(dn)$       & $\mathcal{O}(n{+}d)$ \\
+        \bottomrule
+      \end{tabular}
+      \vspace{0.5em}
+
+      \textbf{Key takeaway:} the quadratic algorithms become inefficient on large
+      arrays; Merge Sort and Quick Sort scale much better; Radix Sort achieved the
+      fastest performance in most large tests.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =====================================================================
+%  SLIDE 5 -- BENCHMARK METHODOLOGY
+% =====================================================================
+\begin{frame}{Benchmark Methodology}
+  \begin{columns}[T]
+    \begin{column}{0.50\textwidth}
+      \textbf{Benchmarking framework implemented entirely in C:}
+      \begin{enumerate}
+        \item \textbf{Data generators} --- fill array with the requested shape
+        \item \textbf{Sorting routines} --- six in-place implementations
+        \item \textbf{Timing layer} --- wrappers around \texttt{clock()}
+        \item \textbf{Benchmarking loop} --- repeats runs, writes \texttt{results.csv}
+      \end{enumerate}
+      \vspace{0.5em}
+      \textbf{Timing formula:}
+      \[
+        t = \frac{t_{\mathrm{end}} - t_{\mathrm{start}}}{\texttt{CLOCKS\_PER\_SEC}}
+            \times 1000 \;\mathrm{ms}
+      \]
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \textbf{Input shapes tested:}
+      \begin{itemize}
+        \item \textbf{Random} arrays
+        \item \textbf{Reversed} arrays
+        \item \textbf{Partially sorted} at five levels:\\
+              PS\,10\%, PS\,30\%, PS\,50\%, PS\,70\%, PS\,90\%
+      \end{itemize}
+      \vspace{0.5em}
+      \begin{block}{Averaging strategy}
+        Small-array tests ($n \leq 100$) are averaged over $10^6$ runs to
+        reduce measurement noise.
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =====================================================================
+%  SLIDE 6 -- EXPERIMENTAL SETUP
+% =====================================================================
+\begin{frame}{Experimental Setup}
+  \begin{columns}[T]
+    \begin{column}{0.46\textwidth}
+      \begin{block}{Compiler and hardware}
+        Personal laptop, Unix-like OS\\
+        \texttt{gcc -O2 -std=c99}
+      \end{block}
+      \vspace{0.6em}
+      \textbf{Array sizes tested:}\\[0.3em]
+      {\footnotesize$n \in \{10,\;50,\;100,\;1\,000,\;10\,000,\;100\,000,\;1\,000\,000\}$}
+      Different input structures were used to observe how performance
+      changes as the input size grows.
+    \end{column}
+    \begin{column}{0.50\textwidth}
+      \textbf{Repetitions per measurement:}
+      \begin{table}
+        \centering
+        \small
+        \begin{tabular}{rl}
+          \toprule
+          \textbf{Size $n$}    & \textbf{Runs averaged} \\
+          \midrule
+          $10$, $50$, $100$    & $1{,}000{,}000$ \\
+          $1{,}000$            & $100$ \\
+          $10{,}000$           & $10$ \\
+          $100{,}000$ and above & $1$ \\
+          \bottomrule
+        \end{tabular}
+      \end{table}
+      \vspace{0.4em}
+      \textbf{Output:} \texttt{results.csv}\\
+      Columns: \texttt{Elements, Runs, Algorithm, Variant, Elapsed~time(ms)}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =====================================================================
+%  SLIDE 7 -- RESULTS: SMALL AND MEDIUM ARRAYS
+% =====================================================================
+\begin{frame}{Results: Small and Medium Arrays}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \centering
+      \textbf{$n=100$ — avg.\ over $10^6$ runs (ms)}\\[0.3em]
+      \tiny\setlength{\tabcolsep}{3pt}
+      \begin{tabular}{lrrrrr}
+        \toprule
+        \textbf{Algorithm} & \textbf{Rev.} & \textbf{Rand.} & \textbf{PS10} & \textbf{PS50} & \textbf{PS90} \\
+        \midrule
+        Bubble    & 0.037 & 0.047 & 0.027 & 0.017 & 0.013 \\
+        Quick     & 0.036 & 0.011 & 0.015 & 0.032 & 0.037 \\
+        Insertion & 0.025 & 0.015 & 0.005 & 0.002 & 0.001 \\
+        Selection & 0.023 & 0.031 & 0.026 & 0.026 & 0.026 \\
+        Merge     & 0.010 & 0.016 & 0.012 & 0.010 & 0.010 \\
+        Radix     & 0.005 & 0.007 & 0.005 & 0.005 & 0.005 \\
+        \bottomrule
+      \end{tabular}\\[0.6em]
+      \textbf{$n=1{,}000$ — avg.\ over 100 runs (ms)}\\[0.3em]
+      \begin{tabular}{lrrrrr}
+        \toprule
+        \textbf{Algorithm} & \textbf{Rev.} & \textbf{Rand.} & \textbf{PS10} & \textbf{PS50} & \textbf{PS90} \\
+        \midrule
+        Bubble    & 3.711 & 3.120 & 2.537 & 2.264 & 2.169 \\
+        Quick     & 3.215 & 0.160 & 0.217 & 0.622 & 1.052 \\
+        Insertion & 2.385 & 1.209 & 0.292 & 0.069 & 0.042 \\
+        Selection & 2.093 & 2.388 & 2.347 & 2.345 & 2.363 \\
+        Merge     & 0.124 & 0.214 & 0.150 & 0.135 & 0.130 \\
+        Radix     & 0.066 & 0.103 & 0.087 & 0.065 & 0.067 \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+    \begin{column}{0.50\textwidth}
+      \begin{tikzpicture}
+        \begin{axis}[
+          title={\footnotesize Random input},
+          xlabel={\scriptsize Array size $n$},
+          ylabel={\scriptsize Time (ms)},
+          xmode=log, ymode=log,
+          width=\linewidth, height=5.8cm,
+          legend pos=north west,
+          legend style={font=\tiny, cells={anchor=west}},
+          grid=major,
+          cycle list name=colormarkers,
+          title style={font=\footnotesize},
+          label style={font=\scriptsize},
+          tick label style={font=\tiny}
+        ]
+          \addplot coordinates {(100,0.047)(1000,3.120)(10000,310.3)(100000,18521)};
+          \addlegendentry{Bubble}
+          \addplot coordinates {(100,0.011)(1000,0.160)(10000,2.1)(100000,10.4)};
+          \addlegendentry{Quick}
+          \addplot coordinates {(100,0.015)(1000,1.209)(10000,118.4)(100000,4199)};
+          \addlegendentry{Insertion}
+          \addplot coordinates {(100,0.031)(1000,2.388)(10000,230.3)(100000,6848)};
+          \addlegendentry{Selection}
+          \addplot coordinates {(100,0.016)(1000,0.214)(10000,2.8)(100000,28.2)};
+          \addlegendentry{Merge}
+          \addplot coordinates {(100,0.007)(1000,0.103)(10000,1.0)(100000,6.4)};
+          \addlegendentry{Radix}
+        \end{axis}
+      \end{tikzpicture}
+      \vspace{-0.3em}
+      \scriptsize Radix Sort and Merge Sort already dominate at medium sizes.
+      Insertion Sort becomes competitive when the input is almost sorted.
+      Quadratic algorithms begin to slow down significantly.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =====================================================================
+%  SLIDE 8 -- RESULTS: LARGE ARRAYS
+% =====================================================================
+\begin{frame}{Results: Large Arrays}
+  \begin{columns}[T]
+    \begin{column}{0.40\textwidth}
+      \centering
+      \tiny\setlength{\tabcolsep}{2.5pt}
+      \begin{tabular}{llrrr}
+        \toprule
+        $n$ & \textbf{Algo.} & \textbf{Rev.} & \textbf{Rand.} & \textbf{PS90} \\
+        \midrule
+        $10^4$  & Bubble    &  361.3 &  310.3 & 230.0 \\
+                & Quick     &  312.1 &    2.1 &  10.6 \\
+                & Insertion &  235.5 &  118.4 &   3.7 \\
+                & Merge     &    1.5 &    2.8 &   1.7 \\
+                & Radix     &    0.9 &    1.0 &   0.9 \\
+        \midrule
+        $10^5$  & Bubble    & 13\,228 & 18\,521 & 7\,640 \\
+                & Quick     & 12\,726 &   10.4 &  72.1 \\
+                & Insertion &  8\,343 & 4\,199 & 122.1 \\
+                & Merge     &   20.6 &   28.2 &  21.4 \\
+                & Radix     &    5.9 &    6.4 &   5.2 \\
+        \midrule
+        $10^6$  & Bubble    & \multicolumn{3}{c}{${\sim}10^6$\,ms (off chart)} \\
+                & Quick     &  114.6 &  130.2 & 148.1 \\
+                & Insertion & $812k$ & $397k$ & 11\,542 \\
+                & Merge     &  232.7 &  359.7 & 227.0 \\
+                & Radix     &   63.6 &   70.5 &  61.9 \\
+        \bottomrule
+      \end{tabular}
+      \vspace{0.15em}
+      
+    \end{column}
+    \begin{column}{0.58\textwidth}
+      \begin{tikzpicture}
+        \begin{axis}[
+          title={\footnotesize Random input --- large $n$ (log-log)},
+          xlabel={\scriptsize Array size $n$},
+          ylabel={\scriptsize Time (ms)},
+          xmode=log, ymode=log,
+          width=\linewidth, height=5.8cm,
+          legend pos=north west,
+          legend style={font=\tiny, cells={anchor=west}},
+          grid=major,
+          cycle list name=colormarkers,
+          title style={font=\footnotesize},
+          label style={font=\scriptsize},
+          tick label style={font=\tiny}
+        ]
+          \addplot coordinates {(10000,310.3)(100000,18521)(1000000,1808240)};
+          \addlegendentry{Bubble Sort}
+          \addplot coordinates {(10000,2.1)(100000,10.4)(1000000,130.2)};
+          \addlegendentry{Quick Sort}
+          \addplot coordinates {(10000,118.4)(100000,4199)(1000000,396592)};
+          \addlegendentry{Insertion Sort}
+          \addplot coordinates {(10000,230.3)(100000,6848)(1000000,657233)};
+          \addlegendentry{Selection Sort}
+          \addplot coordinates {(10000,2.8)(100000,28.2)(1000000,359.7)};
+          \addlegendentry{Merge Sort}
+          \addplot coordinates {(10000,1.0)(100000,6.4)(1000000,70.5)};
+          \addlegendentry{Radix Sort}
+        \end{axis}
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =====================================================================
+%  SLIDE 9 -- ANALYSIS AND PROBLEMS ENCOUNTERED
+% =====================================================================
+\begin{frame}{Analysis and Problems Encountered}
+  \begin{columns}[T]
+    \begin{column}{0.50\textwidth}
+      \begin{block}{Insertion Sort on nearly-sorted input}
+        On PS\,90\% at $n=10^6$: \textbf{11\,542\,ms} vs.\ 396\,592\,ms on random
+        data --- a $\mathbf{34\times}$ speedup.\\[0.3em]
+        This is exactly the property that TimSort exploits.
+      \end{block}
+      \vspace{0.5em}
+      \begin{block}{Quick Sort on structured inputs}
+        Reversed $n=10{,}000$: \textbf{312.1\,ms} --- comparable to Bubble Sort.\\[0.3em]
+        Even median-of-three produces unbalanced partitions on arithmetic sequences.
+      \end{block}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \begin{alertblock}{Problem: Stack overflow}
+        The recursive Quick Sort implementation caused a \textbf{segmentation fault}
+        (stack overflow) on a partially-sorted $n=10^6$ array because of deep
+        recursion.\\[0.3em]
+        After adding the \textbf{median-of-three pivot} strategy the algorithm
+        became much more stable.
+      \end{alertblock}
+      \vspace{0.5em}
+      \begin{exampleblock}{Lesson}
+        Practical implementations may behave very differently from theoretical
+        expectations.
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =====================================================================
+%  SLIDE 10 -- CONCLUSION AND FUTURE WORK
+% =====================================================================
+\begin{frame}{Conclusion and Future Work}
+  \begin{columns}[T]
+    \begin{column}{0.50\textwidth}
+      \textbf{Summary:}
+      \begin{itemize}
+        \item Compared \textbf{six classical sorting algorithms} across multiple
+              array sizes and input structures.
+        \item Confirmed the \textbf{limitations of quadratic algorithms}
+              (unusable past $n \approx 10{,}000$).
+        \item Highlighted the \textbf{efficiency of Merge Sort and Radix Sort}
+              at scale.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \textbf{Future work:}
+      \begin{itemize}
+        \item Test \textbf{additional data types} (floating-point, strings).
+        \item Compare against \textbf{standard library sorts}
+              (\texttt{qsort}, Python Timsort).
+        \item Implement \textbf{iterative Quick Sort} to eliminate stack overflow.
+        \item Profile \textbf{cache behaviour} with Cachegrind.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \vspace{1em}
+  \begin{center}
+    \large\textbf{Thank you for your attention!}
+  \end{center}
+\end{frame}
+
+\end{document}
