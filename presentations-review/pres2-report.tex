@@ -1,0 +1,135 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lmodern}
+
+\usetikzlibrary{positioning}
+
+\geometry{margin=2.5cm}
+
+\definecolor{accent}{HTML}{5E3AA1}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textcolor{accent}{Presentation Review}}
+\rhead{\textcolor{accent}{Sorting Algorithms}}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\setlist[itemize]{
+    leftmargin=1.2cm,
+    itemsep=0.2em
+}
+
+\newcounter{mysection}
+
+\newcommand{\fancysection}[1]{%
+    \stepcounter{mysection}
+    \vspace{0.7cm}
+
+    \noindent
+    \begin{tikzpicture}[baseline=(title.base)]
+        \node[
+            fill=accent,
+            text=white,
+            font=\bfseries\normalsize,
+            minimum width=0.55cm,
+            minimum height=0.55cm
+        ] (num) {\themysection};
+
+        \node[
+            right=0.35cm of num,
+            anchor=west,
+            text=accent,
+            font=\bfseries\Large
+        ] (title) {#1};
+
+        \draw[accent, line width=0.5pt]
+            ([yshift=-0.12cm]title.south west) --
+            ([xshift=10cm,yshift=-0.12cm]title.south west);
+    \end{tikzpicture}
+
+    \vspace{0.35cm}
+}
+
+\begin{document}
+
+\begin{center}
+    \vspace*{0.8cm}
+
+    {\Huge\bfseries\color{accent}
+    The Performance of 15 Sorting Algorithms in C++
+    \par}
+
+    \vspace{0.3cm}
+
+    {\color{accent}
+    \rule{3.5cm}{0.5pt}
+    \hspace{0.25cm}$\diamond$\hspace{0.25cm}
+    \rule{3.5cm}{0.5pt}
+    }
+
+    \vspace{0.4cm}
+
+    {\Large\itshape Presentation Review Report}
+
+    \vspace{0.35cm}
+
+    {\large \textbf{\textcolor{accent}{Presenter:}} Adrian-Andrei Muntoiu}
+
+    \vspace{0.35cm}
+    
+    {\large \textbf{\textcolor{accent}{Reviewer:}} Maria Maiorescu}
+
+    \vspace{0.35cm}
+
+    {\large Faculty of Computer Science}
+
+    {\large West University of Timișoara}
+\end{center}
+
+\vspace{0.8cm}
+
+\fancysection{Main Results Presented}
+
+The presentation investigated the performance of fifteen sorting algorithms implemented in C++. The algorithms included quadratic, comparison-based, non-comparison, and hybrid sorting methods. Experiments were conducted on input sizes ranging from 10 to 100 million elements using different data distributions.
+
+The results showed that non-comparison sorting algorithms, especially Radix Sort and Counting Sort, achieved the best performance on very large datasets. Quick Sort outperformed Merge Sort for large inputs due to better cache locality, while Heap Sort performed worse than expected despite its theoretical complexity. The presentation also demonstrated that practical performance depends not only on asymptotic complexity but also on hardware-related factors such as cache behavior.
+
+\fancysection{What Worked Well in the Presentation}
+
+\begin{itemize}
+    \item The topic was ambitious and covered a large number of sorting algorithms.
+    \item Experimental results were clearly summarized in tables and comparisons.
+    \item The presenter successfully connected theoretical complexity with practical performance.
+    \item The conclusions were supported by extensive benchmarking data.
+    \item The discussion of cache effects provided useful insight beyond standard algorithm analysis.
+\end{itemize}
+
+\fancysection{What Did Not Work Well in the Presentation}
+
+\begin{itemize}
+    \item Because many algorithms were included, some of them could not be discussed in great detail.
+    \item Several tables contained a large amount of numerical data, which required careful attention from the audience.
+    \item More visual graphs could have made the performance comparisons easier to follow.
+\end{itemize}
+
+\fancysection{What I Learned from the Presentation}
+
+I learned that theoretical complexity alone does not always predict real-world performance. Factors such as cache locality and memory access patterns can have a significant impact. I also learned that Radix Sort can be dramatically faster than comparison-based sorting algorithms when sorting large collections of integers.
+
+\fancysection{Questions Asked and Answers Received}
+
+\textbf{\textcolor{accent}{Question:}} Why didn't you run the program more times to make sure that the data is accurate?
+
+\medskip
+
+\textbf{\textcolor{accent}{Answer:}} The presenter explained that he also wanted to include the $O(n^2)$ algorithms in the benchmark. Since these algorithms already required a considerable amount of time to execute, performing multiple runs for every algorithm and input size would have significantly increased the total execution time. For consistency, he preferred to keep the same testing approach for all algorithms rather than repeating only part of the experiments.
+
+\end{document}

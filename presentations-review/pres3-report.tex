@@ -1,0 +1,136 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lmodern}
+
+\usetikzlibrary{positioning}
+
+\geometry{margin=2.5cm}
+
+\definecolor{accent}{HTML}{5E3AA1}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textcolor{accent}{Presentation Review}}
+\rhead{\textcolor{accent}{Sorting Algorithms}}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\setlist[itemize]{
+    leftmargin=1.2cm,
+    itemsep=0.2em
+}
+
+\newcounter{mysection}
+
+\newcommand{\fancysection}[1]{%
+    \stepcounter{mysection}
+    \vspace{0.7cm}
+
+    \noindent
+    \begin{tikzpicture}[baseline=(title.base)]
+        \node[
+            fill=accent,
+            text=white,
+            font=\bfseries\normalsize,
+            minimum width=0.55cm,
+            minimum height=0.55cm
+        ] (num) {\themysection};
+
+        \node[
+            right=0.35cm of num,
+            anchor=west,
+            text=accent,
+            font=\bfseries\Large
+        ] (title) {#1};
+
+        \draw[accent, line width=0.5pt]
+            ([yshift=-0.12cm]title.south west) --
+            ([xshift=10cm,yshift=-0.12cm]title.south west);
+    \end{tikzpicture}
+
+    \vspace{0.35cm}
+}
+
+\begin{document}
+
+\begin{center}
+    \vspace*{0.8cm}
+
+    {\Huge\bfseries\color{accent}
+    A Comparative Benchmark of Sorting Algorithms\\
+    Across Data Structures and Input Distributions
+    \par}
+
+    \vspace{0.3cm}
+
+    {\color{accent}
+    \rule{3.5cm}{0.5pt}
+    \hspace{0.25cm}$\diamond$\hspace{0.25cm}
+    \rule{3.5cm}{0.5pt}
+    }
+
+    \vspace{0.4cm}
+
+    {\Large\itshape Presentation Review Report}
+
+    \vspace{0.35cm}
+
+    {\large \textbf{\textcolor{accent}{Presenter:}} Gabriel Gîrjaliu}
+
+    \vspace{0.35cm}
+    
+    {\large \textbf{\textcolor{accent}{Reviewer:}} Maria Maiorescu}
+
+    \vspace{0.35cm}
+
+    {\large Faculty of Computer Science}
+
+    {\large West University of Timișoara}
+\end{center}
+
+\vspace{0.8cm}
+
+\fancysection{Main Results Presented}
+
+The presentation compared nine sorting algorithms across different input distributions and data structures. The study examined arrays and linked lists, as well as random, sorted, reverse, almost-sorted, flat, float, and string datasets.
+
+The results showed that quadratic algorithms become impractical for large input sizes, while Heap Sort, Merge Sort, Quick Sort, Counting Sort, and Radix Sort scale much better. One of the main conclusions was that Heap Sort achieved the best overall performance among the general-purpose comparison-based algorithms tested. The presentation also showed that input distribution can significantly affect performance, especially for Insertion Sort and Counting Sort.
+
+\fancysection{What Worked Well in the Presentation}
+
+\begin{itemize}
+    \item The experiment considered many factors, including data structures, input distributions, and parallel execution.
+    \item The methodology was clearly explained and easy to follow.
+    \item The results were supported by detailed measurements and comparisons.
+    \item The presenter highlighted both theoretical and practical aspects of sorting algorithms.
+    \item The future work section showed awareness of the limitations of the current implementation.
+\end{itemize}
+
+\fancysection{What Did Not Work Well in the Presentation}
+
+\begin{itemize}
+    \item The amount of experimental data was quite large and sometimes difficult to absorb during a short presentation.
+    \item Some of the performance differences could have been illustrated with additional visual graphs.
+    \item Since the implementation was written in Python, some results may have been influenced by interpreter overhead rather than only by the algorithms themselves.
+\end{itemize}
+
+\fancysection{What I Learned from the Presentation}
+
+I learned that the choice of input distribution can dramatically change algorithm performance. I also learned that linked-list overhead was relatively small in this experiment and that Heap Sort performed better than expected in many of the tested scenarios. Additionally, I gained a better understanding of how implementation details and programming languages can influence benchmarking results.
+
+\fancysection{Questions Asked and Answers Received}
+
+\textbf{\textcolor{accent}{Question:}} Why will rewriting this experiment in C++ help you get better results?
+
+\medskip
+
+\textbf{\textcolor{accent}{Answer:}} The presenter explained that C++ runs directly on the computer hardware without Python's interpreter layer. This allows the use of low-level profiling tools that can measure CPU cache behavior and memory access patterns more accurately. As a result, it becomes easier to determine whether Heap Sort is genuinely faster or whether some of the observed performance differences were influenced by Python's runtime environment.
+
+\end{document}

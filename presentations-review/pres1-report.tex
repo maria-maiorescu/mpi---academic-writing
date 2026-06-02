@@ -1,0 +1,135 @@
+\documentclass[12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{lmodern}
+
+\usetikzlibrary{positioning}
+
+\geometry{margin=2.5cm}
+
+\definecolor{accent}{HTML}{5E3AA1}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textcolor{accent}{Presentation Review}}
+\rhead{\textcolor{accent}{Sorting Algorithms}}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\setlist[itemize]{
+    leftmargin=1.2cm,
+    itemsep=0.2em
+}
+
+\newcounter{mysection}
+
+\newcommand{\fancysection}[1]{%
+    \stepcounter{mysection}
+    \vspace{0.7cm}
+
+    \noindent
+    \begin{tikzpicture}[baseline=(title.base)]
+        \node[
+            fill=accent,
+            text=white,
+            font=\bfseries\normalsize,
+            minimum width=0.55cm,
+            minimum height=0.55cm
+        ] (num) {\themysection};
+
+        \node[
+            right=0.35cm of num,
+            anchor=west,
+            text=accent,
+            font=\bfseries\Large
+        ] (title) {#1};
+
+        \draw[accent, line width=0.5pt]
+            ([yshift=-0.12cm]title.south west) --
+            ([xshift=10cm,yshift=-0.12cm]title.south west);
+    \end{tikzpicture}
+
+    \vspace{0.35cm}
+}
+
+\begin{document}
+
+\begin{center}
+    \vspace*{0.8cm}
+
+    {\Huge\bfseries\color{accent}
+    Experimental Empirical Analysis of Sorting Algorithms
+    \par}
+
+    \vspace{1cm}
+
+    {\color{accent}
+    \rule{3.5cm}{0.5pt}
+    \hspace{0.25cm}$\diamond$\hspace{0.25cm}
+    \rule{3.5cm}{0.5pt}
+    }
+
+    \vspace{0.4cm}
+
+    {\Large\itshape Presentation Review Report}
+
+    \vspace{0.35cm}
+
+    {\large \textbf{\textcolor{accent}{Presenter:}} Daniel Pantea}
+    \\
+    \vspace{0.35cm}
+    
+    {\large \textbf{\textcolor{accent}{Reviewer:}} Maria Maiorescu}
+
+    \vspace{0.35cm}
+
+    {\large Faculty of Computer Science}
+
+    {\large West University of Timișoara}
+\end{center}
+
+\vspace{0.8cm}
+
+\fancysection{Main Results Presented}
+
+The presentation focused on an experimental comparison of six classical sorting algorithms: Bubble Sort, Insertion Sort, Selection Sort, Merge Sort, Quick Sort, and Radix Sort. The algorithms were implemented in C and tested on arrays of different sizes and input structures, including random, reversed, and partially sorted data.
+
+The results showed that Bubble Sort and Selection Sort become inefficient for large inputs, while Merge Sort and Quick Sort remain efficient in most situations. Radix Sort achieved the best performance for large integer arrays. The presentation also highlighted how the structure of the input data can significantly influence practical performance, especially for Insertion Sort and Quick Sort.
+
+\fancysection{What Worked Well in the Presentation}
+
+\begin{itemize}
+    \item The presentation was well organized and followed a logical structure.
+    \item The objectives and methodology were clearly explained.
+    \item The graphs helped visualize the performance differences between algorithms.
+    \item The presenter successfully connected theoretical complexity with experimental results.
+    \item The conclusions were supported by the collected data.
+\end{itemize}
+
+\fancysection{What Did Not Work Well in the Presentation}
+
+\begin{itemize}
+    \item Figure 2 from slide 9 is difficult to understand.
+    \item The problems encountered are not detailed enough and the resolution is not clear.
+    \item More examples of real-world applications could have made the topic even more engaging.
+\end{itemize}
+
+\fancysection{What I Learned from the Presentation}
+
+I learned that input structure has a major impact on the practical performance of sorting algorithms. In particular, Insertion Sort performs much better on nearly sorted data than its theoretical average-case complexity might suggest. I also learned that Radix Sort can outperform comparison-based algorithms when sorting large arrays of integers.
+
+\fancysection{Questions Asked and Answers Received}
+
+\textbf{\textcolor{accent}{Question:}} Did you have any issues when running the program?
+
+\medskip
+
+\textbf{\textcolor{accent}{Answer:}} Yes. The presenter initially encountered a segmentation fault while running Quick Sort because an incorrect pivot was chosen. The issue was solved by switching to the median-of-three pivot strategy, which improves the likelihood of obtaining balanced partitions and generally leads to better Quick Sort performance.
+
+\end{document}

@@ -3,13 +3,13 @@ algorithms
 tempCodeRunnerFile.c
 
 # LaTeX auxiliary / build output
-*.aux
-*.bbl
-*.blg
-*.log
-*.out
-*.synctex.gz
-*.toc
+**.aux
+**.bbl
+**.blg
+**.log
+**.out
+**.synctex.gz
+**.toc
 missfont.log
 
 # Generated PDF (keep if you want to track it; comment out otherwise)
