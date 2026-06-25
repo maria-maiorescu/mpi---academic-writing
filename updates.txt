@@ -1,0 +1,8 @@
+Changes made in this revision:
+- Section 3.4 title: Changed "LSD and MSD Radix Sort" - "LSD Radix Sort" (only LSD implemented)
+- Section 3.5 Timing Methodology: Added explicit explanation of CPU time vs wall-clock time
+- Quick Sort data corrected using a fresh set of tests (tables and graphs)
+- Section 4.5 Analysis: Rewrote Quick Sort paragraph to reflect corrected performance 
+- Section 5 Related Work: Rephrased
+- Section 6.1 Summary: Updated Quick Sort performance
+- Section 6.2 Problems: Removed segmentation fault discussion
