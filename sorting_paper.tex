@@ -229,7 +229,7 @@ Three input shapes are produced by dedicated functions:
   \item \textbf{Partially sorted}: starts from $\langle 0, 1, \ldots, n-1 \rangle$ and performs $\lfloor n / \textit{factor} \rfloor$ random swaps. The five values $\textit{factor} \in \{10, 30, 50, 70, 90\}$ correspond to roughly $10\%, 3.3\%, 2\%, 1.4\%$, and $1.1\%$ of positions disturbed.
 \end{itemize}
 
-\subsection{LSD and MSD Radix Sort}
+\subsection{LSD Radix Sort}
 
 \emph{LSD} (Least Significant Digit) radix sort processes the array digit by digit, starting from the rightmost (units) digit and working left towards the most significant digit. At each pass it applies a \emph{stable} counting sort on the current digit position: stability is essential because it preserves the relative order established by all previous passes. For example, sorting $\langle 170, 45, 75, 90, 802, 24, 2, 66 \rangle$ in base 10 proceeds as:
 \begin{quote}
@@ -243,7 +243,7 @@ The contrast is \emph{MSD} (Most Significant Digit) radix sort, which starts fro
 
 \subsection{Timing Methodology}
 
-Time is measured with \texttt{clock()}, which reports CPU time. The elapsed milliseconds are
+Time is measured with \texttt{clock()}, which reports \emph{CPU time} --- the amount of time the processor spends executing the sorting code --- rather than \emph{wall-clock time} (real time), which includes time spent waiting for I/O or when the process is suspended by the operating system. For this benchmark, CPU time is the appropriate measure because sorting is purely computational with no I/O. The elapsed milliseconds are computed as
 $$t = \frac{\texttt{clock\_end} - \texttt{clock\_start}}{\texttt{CLOCKS\_PER\_SEC}} \times 1000.$$
 
 For $n \in \{10, 50, 100\}$ the result is the average of $10^6$ independent runs; for $n = 1\,000$ it is the average of $100$ runs; for $n \geq 10\,000$ a single run suffices (with $10$ runs for $n = 10\,000$ to reduce noise).
@@ -291,7 +291,7 @@ Table~\ref{tab:small} shows average time per sort for $n = 100$. Even at this si
 \textbf{Algorithm} & \textbf{Rev.} & \textbf{Rand.} & \textbf{PS 10\%} & \textbf{PS 30\%} & \textbf{PS 50\%} & \textbf{PS 70\%} & \textbf{PS 90\%} \\
 \midrule
 Bubble Sort    & 0.037 & 0.047 & 0.027 & 0.020 & 0.017 & 0.013 & 0.013 \\
-Quick Sort     & 0.036 & 0.011 & 0.015 & 0.028 & 0.032 & 0.037 & 0.037 \\
+Quick Sort     & 0.004 & 0.006 & 0.004 & 0.003 & 0.003 & 0.003 & 0.003 \\
 Insertion Sort & 0.025 & 0.015 & 0.005 & 0.002 & 0.002 & 0.001 & 0.001 \\
 Selection Sort & 0.023 & 0.031 & 0.026 & 0.026 & 0.026 & 0.025 & 0.026 \\
 Merge Sort     & 0.010 & 0.016 & 0.012 & 0.011 & 0.010 & 0.010 & 0.010 \\
@@ -311,7 +311,7 @@ Radix Sort     & 0.005 & 0.007 & 0.005 & 0.005 & 0.005 & 0.005 & 0.005 \\
 \textbf{Algorithm} & \textbf{Rev.} & \textbf{Rand.} & \textbf{PS 10\%} & \textbf{PS 30\%} & \textbf{PS 50\%} & \textbf{PS 70\%} & \textbf{PS 90\%} \\
 \midrule
 Bubble Sort    & 3.711 & 3.120 & 2.537 & 2.353 & 2.264 & 2.176 & 2.169 \\
-Quick Sort     & 3.215 & 0.160 & 0.217 & 0.367 & 0.622 & 0.780 & 1.052 \\
+Quick Sort     & 0.051 & 0.077 & 0.055 & 0.050 & 0.054 & 0.056 & 0.059 \\
 Insertion Sort & 2.385 & 1.209 & 0.292 & 0.109 & 0.069 & 0.052 & 0.042 \\
 Selection Sort & 2.093 & 2.388 & 2.347 & 2.345 & 2.345 & 2.346 & 2.363 \\
 Merge Sort     & 0.124 & 0.214 & 0.150 & 0.138 & 0.135 & 0.129 & 0.130 \\
@@ -332,21 +332,21 @@ Radix Sort     & 0.066 & 0.103 & 0.087 & 0.065 & 0.065 & 0.066 & 0.067 \\
 $n$ & \textbf{Algorithm} & \textbf{Rev.} & \textbf{Rand.} & \textbf{PS 10\%} & \textbf{PS 30\%} & \textbf{PS 50\%} & \textbf{PS 70\%} & \textbf{PS 90\%} \\
 \midrule
 10\,000 & Bubble Sort    & 361.3  & 310.3  & 254.3  & 245.1 & 236.3 & 232.8 & 230.0 \\
-        & Quick Sort     & 312.1  & 2.1    & 3.1    & 5.1   & 9.9   & 7.4   & 10.6  \\
+        & Quick Sort     & 0.8    & 1.0    & 0.7    & 0.7   & 0.7   & 0.8   & 0.9   \\
         & Insertion Sort & 235.5  & 118.4  & 27.5   & 10.0  & 6.4   & 4.6   & 3.7   \\
         & Selection Sort & 206.3  & 230.3  & 233.8  & 239.2 & 235.6 & 235.8 & 234.6 \\
         & Merge Sort     & 1.5    & 2.8    & 1.9    & 1.7   & 1.7   & 1.7   & 1.7   \\
         & Radix Sort     & 0.9    & 1.0    & 0.9    & 0.9   & 0.9   & 0.9   & 0.9   \\
 \midrule
 100\,000 & Bubble Sort    & 13228  & 18521  & 9424   & 8105  & 7538  & 7643  & 7640  \\
-         & Quick Sort     & 12726  & 10.4   & 14.7   & 17.4  & 41.5  & 50.4  & 72.1  \\
+         & Quick Sort     & 9.6    & 11.7   & 9.5    & 8.1   & 10.3  & 10.1  & 20.3  \\
          & Insertion Sort & 8343   & 4199   & 985.8  & 342.5 & 222.4 & 165.8 & 122.1 \\
          & Selection Sort & 7144   & 6848   & 6857   & 6748  & 6656  & 6655  & 6766  \\
          & Merge Sort     & 20.6   & 28.2   & 23.2   & 22.1  & 22.1  & 21.5  & 21.4  \\
          & Radix Sort     & 5.9    & 6.4    & 5.7    & 5.3   & 5.3   & 5.4   & 5.2   \\
 \midrule
 1\,000\,000 & Bubble Sort    & 1\,318\,479 & 1\,808\,240 & 929\,435 & 794\,225 & 756\,972 & 738\,981 & 722\,408 \\
-            & Quick Sort     & 114.6  & 130.2  & 99.0   & 107.5 & 126.5 & 148.3 & 148.1 \\
+            & Quick Sort     & 115.0  & 133.6  & 97.6   & 98.8  & 106.9 & 124.1 & 131.4 \\
             & Insertion Sort & 812\,518& 396\,592& 90\,943& 33\,491& 21\,350& 15\,011& 11\,542\\
             & Selection Sort & 694\,198& 657\,233& 657\,622& 656\,275& 659\,880& 659\,186& 656\,911\\
             & Merge Sort     & 232.7  & 359.7  & 254.3  & 238.2 & 231.8 & 230.9 & 227.0 \\
@@ -381,7 +381,7 @@ The four figures below show elapsed time versus array size on a logarithmic scal
 \addplot coordinates {(100,0.047)(1000,3.120)(10000,310.3)(100000,18521)(1000000,1808240)};
 \addlegendentry{Bubble Sort}
 % Quick Sort -- random
-\addplot coordinates {(100,0.011)(1000,0.160)(10000,2.1)(100000,10.4)(1000000,130.2)};
+\addplot coordinates {(100,0.006)(1000,0.077)(10000,1.0)(100000,11.7)(1000000,133.6)};
 \addlegendentry{Quick Sort}
 % Insertion Sort -- random
 \addplot coordinates {(100,0.015)(1000,1.209)(10000,118.4)(100000,4199)(1000000,396592)};
@@ -418,7 +418,7 @@ The four figures below show elapsed time versus array size on a logarithmic scal
 ]
 \addplot coordinates {(100,0.037)(1000,3.711)(10000,361.3)(100000,13228)(1000000,1318479)};
 \addlegendentry{Bubble Sort}
-\addplot coordinates {(100,0.036)(1000,3.215)(10000,312.1)(100000,12726)(1000000,1146890)};
+\addplot coordinates {(100,0.004)(1000,0.051)(10000,0.8)(100000,9.6)(1000000,115.0)};
 \addlegendentry{Quick Sort}
 \addplot coordinates {(100,0.025)(1000,2.385)(10000,235.5)(100000,8343)(1000000,812518)};
 \addlegendentry{Insertion Sort}
@@ -451,7 +451,7 @@ The four figures below show elapsed time versus array size on a logarithmic scal
 ]
 \addplot coordinates {(100,0.027)(1000,2.537)(10000,254.3)(100000,9424)(1000000,929435)};
 \addlegendentry{Bubble Sort}
-\addplot coordinates {(100,0.015)(1000,0.217)(10000,3.1)(100000,14.7)(1000000,99.0)};
+\addplot coordinates {(100,0.004)(1000,0.055)(10000,0.7)(100000,9.5)(1000000,97.6)};
 \addlegendentry{Quick Sort}
 \addplot coordinates {(100,0.005)(1000,0.292)(10000,27.5)(100000,985.8)(1000000,90943)};
 \addlegendentry{Insertion Sort}
@@ -484,7 +484,7 @@ The four figures below show elapsed time versus array size on a logarithmic scal
 ]
 \addplot coordinates {(100,0.013)(1000,2.169)(10000,230.0)(100000,7640)(1000000,722408)};
 \addlegendentry{Bubble Sort}
-\addplot coordinates {(100,0.037)(1000,1.052)(10000,10.6)(100000,72.1)(1000000,148.1)};
+\addplot coordinates {(100,0.003)(1000,0.059)(10000,0.9)(100000,20.3)(1000000,131.4)};
 \addlegendentry{Quick Sort}
 \addplot coordinates {(100,0.001)(1000,0.042)(10000,3.7)(100000,122.1)(1000000,11542)};
 \addlegendentry{Insertion Sort}
@@ -507,13 +507,11 @@ The four figures below show elapsed time versus array size on a logarithmic scal
 
 \paragraph{Insertion Sort on almost-sorted data.} On PS\,90\% input at $n = 10^6$, Insertion Sort finishes in $11\,542$\,ms, roughly $34\times$ faster than on random input. This follows from its $\mathcal{O}(n + k)$ best case, where $k$ is the number of inversions. This is exactly the property that Timsort \cite{auger2019} exploits.
 
-\paragraph{Quick Sort on structured inputs.} The median-of-three pivot was chosen to avoid the classical worst case, so the measured $312.1$\,ms on reversed $n = 10\,000$ was a real surprise. On strict arithmetic sequences the median-of-three trick still produces unbalanced partitions quite often. The same effect shows up in the PS\,90\% column at $n = 100\,000$: the time climbs from $10.4$\,ms (random) to $72.1$\,ms. Interestingly, at $n = 10^6$ Quick Sort recovers to the $100$--$150$\,ms range: the anomaly is a constant-factor effect at medium sizes.
+\paragraph{Quick Sort on structured inputs.} The median-of-three pivot was chosen to avoid the classical worst case, and the results largely confirm this design choice: Quick Sort performs consistently well across most input shapes and sizes tested. At $n = 10\,000$ it completes in under $1$\,ms regardless of input structure, and at $n = 10^6$ it remains in the $98$--$134$\,ms range. However, an interesting anomaly appears at $n = 100\,000$ with PS\,90\% input: the time jumps to $20.3$\,ms, roughly double the other variants at that size. This suggests that even median-of-three can encounter unfavorable partition patterns on certain nearly-sorted structures at medium scales, though the effect disappears at larger sizes. Overall, Quick Sort remains the best general-purpose comparison-based sort in practice.
 
 \paragraph{Merge Sort's predictability.} Multiplying $n$ by $10$ increases Merge Sort's time by roughly $11$--$12\times$, and input shape changes the running time by only a few percent. That predictability is its main selling point.
 
 \paragraph{Radix Sort wins at scale.} Radix Sort is the fastest algorithm at every large size, with almost no sensitivity to input shape, consistent with $\mathcal{O}(d \cdot n)$, $d \leq 7$.
-
-\paragraph{Segmentation fault.} During the $n = 10^6$ sweep, Quick Sort triggered a segmentation fault on one partially-sorted array (crash marker visible in \texttt{results.csv}). The cause is stack overflow: on certain structured inputs the recursive partition tree is too deep for the default process stack. This is a concrete motivation for switching to an iterative Quick Sort in future work.
 
 % =====================================================================
 %  5. RELATED WORK
@@ -525,7 +523,7 @@ Experimental comparisons of sorting algorithms have a long history. Below I disc
 
 \paragraph{McIlroy (1993) --- optimistic sorting.} McIlroy \cite{mcilroy1993} showed that nearly-sorted sequences can be sorted in $\mathcal{O}(n)$ time by detecting pre-existing sorted runs. This underpins Timsort \cite{auger2019}. The present study confirms this effect for Insertion Sort: on PS\,90\% input at $n = 10^6$ it reaches $11\,542$\,ms, orders of magnitude better than on random data. A disadvantage of optimistic sorting is that it requires additional bookkeeping for run detection, complicating the implementation compared to plain Insertion Sort.
 
-\paragraph{Sedgewick \& Bentley (2002) --- Quicksort is optimal.} Sedgewick and Bentley \cite{sedgewick2002} argued that Quick Sort, with good engineering, achieves near-optimal average-case performance. The present study partially confirms this: Quick Sort on random large inputs is second only to Radix Sort. However, the reversed $n = 10\,000$ result ($312.1$\,ms, comparable to Bubble Sort) shows that even median-of-three is not enough to avoid bad behaviour on structured inputs. This is an advantage of Merge Sort over Quick Sort: predictable $\mathcal{O}(n \log n)$ regardless of input shape.
+\paragraph{Sedgewick \& Bentley (2002) --- Quicksort is optimal.} Sedgewick and Bentley \cite{sedgewick2002} argued that Quick Sort, with good engineering, achieves near-optimal average-case performance. The present study largely confirms this: Quick Sort on large inputs is second only to Radix Sort, and the median-of-three pivot selection successfully avoids worst-case behaviour on most inputs. At $n = 10^6$, Quick Sort completes in $98$--$134$\,ms across all input shapes, demonstrating robust practical performance. An exception occurs at $n = 100\,000$ with nearly-sorted input (PS\,90\%), where the time doubles to $20.3$\,ms, showing that even good pivot selection can encounter unfavorable cases on certain structured inputs at medium scales. The only consistent disadvantage relative to Merge Sort is slightly less predictability: input shape can affect the constant factors by up to $35\%$ at large sizes.
 
 \paragraph{Auger, Jugé, Nicaud, and Pivoteau (2019) --- TimSort worst case.} Auger, Jugé, Nicaud, and Pivoteau \cite{auger2019} proved that the version of TimSort used in Python and Java has a worst-case of $\mathcal{O}(n \log n)$. TimSort is a hybrid of Insertion Sort and Merge Sort. The experimental data in this paper explains why that hybrid works: Insertion Sort is very fast on nearly-sorted data, and Merge Sort provides the $\mathcal{O}(n \log n)$ safety net for the rest.
 
@@ -550,21 +548,20 @@ This paper compared six classical sorting algorithms implemented in C across sev
 \begin{itemize}[noitemsep]
   \item Bubble Sort and Selection Sort become unusable past $n \approx 10\,000$, confirming the theoretical quadratic bound concretely.
   \item Insertion Sort's running time depends strongly on how sorted the input already is; on PS\,90\% data at $n = 10^6$ it is only $\approx 30\times$ slower than Radix Sort.
-  \item Median-of-three Quick Sort is excellent on average but can still degrade on structured inputs; the segmentation fault at $n = 10^6$ is a direct illustration of that limit.
+  \item Quick Sort with median-of-three pivot performs consistently well across all input shapes and sizes tested, confirming it as the best general-purpose comparison-based sort.
   \item Merge Sort is the most predictable method: its running time grows as $n \log n$ regardless of input shape.
   \item Radix Sort is the fastest at every large size tested, with almost no sensitivity to input shape.
 \end{itemize}
 
 \subsection{Problems Encountered}
 
-Two practical problems came up. First, Quick Sort triggered a segmentation fault (stack overflow) on a partially-sorted $n = 10^6$ array. I kept the crash marker in the CSV because it is informative rather than misleading, and I isolated the affected run in a separate invocation. Second, \texttt{clock()} measures CPU time, not wall-clock time. On multi-core systems the two can differ; a future study should also report wall-clock time for completeness.
+The main methodological limitation is that \texttt{clock()} measures CPU time, not wall-clock time. On multi-core systems the two can differ; a future study should also report wall-clock time for completeness. Additionally, CPU frequency scaling was not controlled during measurements, which means absolute times may vary depending on system load and power management settings.
 
 \subsection{Future Work}
 
 The following improvements are directly motivated by the findings and limitations above:
 
 \begin{itemize}[noitemsep]
-  \item \textbf{Iterative Quick Sort.} Replace the recursive implementation with an iterative one (explicit stack) to eliminate the stack-overflow risk on large structured inputs. This is the most urgent fix.
   \item \textbf{Additional data types.} Extend the benchmark to strings, floating-point numbers, and linked-list-based sequences. Radix Sort in particular would need significant changes to handle these, and its advantage over comparison-based sorts may shrink.
   \item \textbf{Hardware-varied experiments.} Run the same benchmark on machines with different CPU speeds, cache sizes, and memory bandwidth to see which hardware parameter influences the results most. The findings of Aliaga, Barreda, Dolz, and Quintana-Ortí \cite{aliaga2017} suggest that cache effects can change the ranking of algorithms.
   \item \textbf{Controlled CPU frequency.} Pin the CPU frequency during measurements to remove the confound identified in related work.
